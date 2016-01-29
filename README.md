@@ -6,9 +6,11 @@ Make sure you use maven 3.x.x + to build your FirstSpirit module.
 
 # Getting started
 
-> Plugin Configuration
+## Plugin Configuration
+
 * You have to configure the pluginwith an config.xml, the prototype.xml an a target.
 * Your plugin configuration should look like:
+
 ```
     <plugin>
         <groupId>com.monday.webforms.firstspirit</groupId>
@@ -30,9 +32,11 @@ Make sure you use maven 3.x.x + to build your FirstSpirit module.
     </plugin>
 ```
 
-> Config XML
+## Config XML
+
 * In your config.xml you have to configure which an what of your build webapp should be included in your FS module.
 * Your config.xml should look like:
+
 ```
     <?xml version="1.0" encoding="UTF-8"?>
     <webforms-maven-plugin>
@@ -78,10 +82,12 @@ Make sure you use maven 3.x.x + to build your FirstSpirit module.
     </webforms-maven-plugin>
 ```
 
-> Prototype XML
+## Prototype XML
+
 * This is your prototype FS module descriptor which will be consumed via this plugin to generate your working module.xml
 * In this file you will configure your FirstSpirit module components (project and web components).
 * Your prototype XML could look like:
+
 ```
     <module>
         <name>Monday Webforms</name>
@@ -147,8 +153,9 @@ Make sure you use maven 3.x.x + to build your FirstSpirit module.
     </module>
 ```
 
-> Generated module XML
-* The following file shows you an generated module.xml snippet
+## Generated module XML
+
+* The following file shows you an generated module.xml snippet:
 
 ```
     <module>
