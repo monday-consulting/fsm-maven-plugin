@@ -1,4 +1,4 @@
-package com.monday.webforms.maven.plugin.util.resolver;
+package com.monday.fsm.maven.plugin.util.resolver;
 
 /*
 Copyright 2016 Monday Consulting GmbH
@@ -16,8 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import com.monday.webforms.maven.plugin.jaxb.ModuleType;
-import com.monday.webforms.maven.plugin.util.Module;
+import com.monday.fsm.maven.plugin.jaxb.ModuleType;
+import com.monday.fsm.maven.plugin.util.Module;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.plugin.MojoExecutionException;

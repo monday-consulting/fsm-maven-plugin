@@ -1,4 +1,4 @@
-package com.monday.webforms.maven.plugin.util;
+package com.monday.fsm.maven.plugin.util;
 
 /*
 Copyright 2016 Monday Consulting GmbH

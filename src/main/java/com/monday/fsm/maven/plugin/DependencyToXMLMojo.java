@@ -1,4 +1,4 @@
-package com.monday.webforms.maven.plugin;
+package com.monday.fsm.maven.plugin;
 
 /*
 Copyright 2016 Monday Consulting GmbH
@@ -16,13 +16,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import com.monday.webforms.maven.plugin.jaxb.ModuleType;
-import com.monday.webforms.maven.plugin.jaxb.WebformsMavenPluginType;
-import com.monday.webforms.maven.plugin.util.Module;
-import com.monday.webforms.maven.plugin.util.PrototypeXml;
-import com.monday.webforms.maven.plugin.util.XmlValidationEventHandler;
-import com.monday.webforms.maven.plugin.util.resolver.IResolver;
-import com.monday.webforms.maven.plugin.util.resolver.MavenGetArtifactsResolver;
+import com.monday.fsm.maven.plugin.jaxb.WebformsMavenPluginType;
+import com.monday.fsm.maven.plugin.util.XmlValidationEventHandler;
+import com.monday.fsm.maven.plugin.util.resolver.IResolver;
+import com.monday.fsm.maven.plugin.jaxb.ModuleType;
+import com.monday.fsm.maven.plugin.util.Module;
+import com.monday.fsm.maven.plugin.util.PrototypeXml;
+import com.monday.fsm.maven.plugin.util.resolver.MavenGetArtifactsResolver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;

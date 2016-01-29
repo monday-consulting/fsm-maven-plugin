@@ -1,4 +1,4 @@
-package com.monday.webforms.maven.plugin.util;
+package com.monday.fsm.maven.plugin.util;
 
 /*
 Copyright 2016 Monday Consulting GmbH
@@ -16,10 +16,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import com.monday.webforms.maven.plugin.jaxb.ExcludeType;
-import com.monday.webforms.maven.plugin.jaxb.IncludeType;
-import com.monday.webforms.maven.plugin.jaxb.ModuleType;
-import com.monday.webforms.maven.plugin.jaxb.Resource;
+import com.monday.fsm.maven.plugin.jaxb.ModuleType;
+import com.monday.fsm.maven.plugin.jaxb.ExcludeType;
+import com.monday.fsm.maven.plugin.jaxb.IncludeType;
+import com.monday.fsm.maven.plugin.jaxb.Resource;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.maven.artifact.Artifact;
