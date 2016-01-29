@@ -1,6 +1,6 @@
-# Monday Webforms FirstSpirit Maven Plugin [![Build Status](https://travis-ci.org/monday-consulting/webforms-maven-plugin.svg?branch=master)](https://travis-ci.org/monday-consulting/webforms-maven-plugin)
+# Monday FirstSpirit Maven Plugin [![Build Status](https://travis-ci.org/monday-consulting/webforms-maven-plugin.svg?branch=master)](https://travis-ci.org/monday-consulting/webforms-maven-plugin)
 
-Maven plugin to generate module XML descriptors for FirstSpirit modules. It is generally used to build monday webforms specific FS modules.
+Maven plugin to generate XML descriptors for FirstSpirit modules. It is generally used to build monday webforms specific FS modules.
 
 Make sure you use maven 3.x.x + to build your FirstSpirit module.
 
@@ -8,7 +8,7 @@ Make sure you use maven 3.x.x + to build your FirstSpirit module.
 
 ## Plugin Configuration
 
-* You have to configure the pluginwith an config.xml, the prototype.xml an a target.
+* You have to configure the plugin with an config.xml, the prototype.xml an a target.
 * Your plugin configuration should look like:
 
 ```
