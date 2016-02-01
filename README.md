@@ -13,7 +13,7 @@ Make sure you use maven 3.x.x or newer when integrating this plugin into your wo
 
 ```
     <plugin>
-        <groupId>com.monday.maven.plugins</groupId>
+        <groupId>com.monday-consulting.maven.plugins</groupId>
         <artifactId>fsm-maven-plugin</artifactId>
         <configuration>
             <prototypeXml>${basedir}/target/extra-resources/prototype.module.xml</prototypeXml>
