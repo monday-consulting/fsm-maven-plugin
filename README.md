@@ -1,4 +1,4 @@
-# Monday FirstSpirit Module Maven Plugin [![Build Status](https://travis-ci.org/monday-consulting/webforms-maven-plugin.svg?branch=master)](https://travis-ci.org/monday-consulting/webforms-maven-plugin)
+# Monday FirstSpirit Module Maven Plugin [![Build Status](https://travis-ci.org/monday-consulting/fsm-maven-plugin.svg?branch=master)](https://travis-ci.org/monday-consulting/fsm-maven-plugin)
 
 You can use this Maven plugin to generate XML descriptors for FirstSpirit modules.
 
