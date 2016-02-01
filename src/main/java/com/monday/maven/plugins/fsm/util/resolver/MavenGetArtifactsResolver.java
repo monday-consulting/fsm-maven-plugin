@@ -1,4 +1,4 @@
-package com.monday.fsm.maven.plugin.util.resolver;
+package com.monday.maven.plugins.fsm.util.resolver;
 
 /*
 Copyright 2016 Monday Consulting GmbH
@@ -16,8 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import com.monday.fsm.maven.plugin.jaxb.ModuleType;
-import com.monday.fsm.maven.plugin.util.Module;
+import com.monday.maven.plugins.fsm.jaxb.ModuleType;
+import com.monday.maven.plugins.fsm.util.Module;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Handles resolution of an artifact within the maven reactor.
+ * Handles the resolution of an artifact within the maven reactor or repository.
  * @author Kassim Hölting
  * @author Hannes Thielker
  * @since 1.0.0

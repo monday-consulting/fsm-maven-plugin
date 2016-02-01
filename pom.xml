@@ -30,7 +30,7 @@
                 <configuration>
                     <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
                     <schemaFiles>fsm-plugin.xsd</schemaFiles>
-                    <packageName>com.monday.fsm.maven.plugin.jaxb</packageName>
+                    <packageName>com.monday.maven.plugins.fsm.jaxb</packageName>
                     <clearOutputDir>true</clearOutputDir>
                 </configuration>
             </plugin>

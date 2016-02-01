@@ -1,4 +1,4 @@
-package com.monday.fsm.maven.plugin.util;
+package com.monday.maven.plugins.fsm.util;
 
 /*
 Copyright 2016 Monday Consulting GmbH
@@ -16,10 +16,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import com.monday.fsm.maven.plugin.jaxb.ModuleType;
-import com.monday.fsm.maven.plugin.jaxb.ExcludeType;
-import com.monday.fsm.maven.plugin.jaxb.IncludeType;
-import com.monday.fsm.maven.plugin.jaxb.Resource;
+import com.monday.maven.plugins.fsm.jaxb.ModuleType;
+import com.monday.maven.plugins.fsm.jaxb.ExcludeType;
+import com.monday.maven.plugins.fsm.jaxb.IncludeType;
+import com.monday.maven.plugins.fsm.jaxb.Resource;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.maven.artifact.Artifact;
@@ -107,7 +107,7 @@ public class Module {
     }
 
     /**
-     * Setter for the resolved module artifacts. Besides filling the module dependency dom.
+     * Setter for the resolved module artifacts. Besides this method is filling the module dependency dom.
      *
      * @param resolvedModuleArtifacts The to be set resolved module artifacts.
      * @throws MojoFailureException in case of plugin configuration problems.

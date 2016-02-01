@@ -1,4 +1,4 @@
-package com.monday.fsm.maven.plugin;
+package com.monday.maven.plugins.fsm;
 
 /*
 Copyright 2016 Monday Consulting GmbH
@@ -16,13 +16,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import com.monday.fsm.maven.plugin.jaxb.WebformsMavenPluginType;
-import com.monday.fsm.maven.plugin.util.XmlValidationEventHandler;
-import com.monday.fsm.maven.plugin.util.resolver.IResolver;
-import com.monday.fsm.maven.plugin.jaxb.ModuleType;
-import com.monday.fsm.maven.plugin.util.Module;
-import com.monday.fsm.maven.plugin.util.PrototypeXml;
-import com.monday.fsm.maven.plugin.util.resolver.MavenGetArtifactsResolver;
+import com.monday.maven.plugins.fsm.jaxb.FsmMavenPluginType;
+import com.monday.maven.plugins.fsm.jaxb.ModuleType;
+import com.monday.maven.plugins.fsm.util.Module;
+import com.monday.maven.plugins.fsm.util.PrototypeXml;
+import com.monday.maven.plugins.fsm.util.XmlValidationEventHandler;
+import com.monday.maven.plugins.fsm.util.resolver.IResolver;
+import com.monday.maven.plugins.fsm.util.resolver.MavenGetArtifactsResolver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -135,7 +135,7 @@ public class DependencyToXMLMojo extends AbstractMojo {
             if (getLog().isDebugEnabled())
                 getLog().debug("Create config-xml-Object");
 
-            final WebformsMavenPluginType config = bindXmlConfigToPojo(configXml);
+            final FsmMavenPluginType config = bindXmlConfigToPojo(configXml);
 
             if (getLog().isDebugEnabled())
                 getLog().debug("Creating PrototypeXml-Object");
@@ -212,19 +212,19 @@ public class DependencyToXMLMojo extends AbstractMojo {
      * @return WebformsMavenPluginType  The corresponding Java-Object of the plugin-configuration.
      * @throws MojoExecutionException   in case of marshalling exception for the fsm-plugin.xsd.
      */
-    private WebformsMavenPluginType bindXmlConfigToPojo(final File configXml) throws MojoExecutionException {
+    private FsmMavenPluginType bindXmlConfigToPojo(final File configXml) throws MojoExecutionException {
         getLog().debug("***Constructing ConfigXml-Object");
 
         try {
             final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             final Schema schema = sf.newSchema(getClass().getResource("/fsm-plugin.xsd"));
             final StreamSource streamSource = new StreamSource(configXml);
-            final JAXBContext jaxbContext = JAXBContext.newInstance(WebformsMavenPluginType.class);
+            final JAXBContext jaxbContext = JAXBContext.newInstance(FsmMavenPluginType.class);
             final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             unmarshaller.setSchema(schema);
             unmarshaller.setEventHandler(new XmlValidationEventHandler(getLog()));
 
-            final JAXBElement<WebformsMavenPluginType> jaxbElement = unmarshaller.unmarshal(streamSource, WebformsMavenPluginType.class);
+            final JAXBElement<FsmMavenPluginType> jaxbElement = unmarshaller.unmarshal(streamSource, FsmMavenPluginType.class);
             return jaxbElement.getValue();
         } catch (SAXException e) {
             throw new MojoExecutionException(e, "Error while parsing file with SAX", e.getMessage());

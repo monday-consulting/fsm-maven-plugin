@@ -2,14 +2,14 @@
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xs:element name="webforms-maven-plugin" type="webforms-maven-pluginType">
+    <xs:element name="fsm-maven-plugin" type="fsm-maven-pluginType">
         <xs:unique name="uniqueModuleId">
             <xs:selector xpath=".//module/id"/>
             <xs:field xpath="."/>
         </xs:unique>
     </xs:element>
 
-    <xs:complexType name="webforms-maven-pluginType">
+    <xs:complexType name="fsm-maven-pluginType">
         <xs:sequence>
             <xs:element type="scopesType" name="scopes"/>
             <xs:element type="modulesType" name="modules"/>

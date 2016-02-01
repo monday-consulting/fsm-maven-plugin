@@ -8,7 +8,7 @@ Make sure you use maven 3.x.x or newer when integrating this plugin into your wo
 
 ## Plugin Configuration
 
-* You have to configure the plugin with an config.xml, the prototype.xml and a target.
+* You have to configure the plugin with an prototype.xml, the config.xml and a target.
 * Your plugin configuration should look like this:
 
 ```
@@ -16,8 +16,8 @@ Make sure you use maven 3.x.x or newer when integrating this plugin into your wo
         <groupId>com.monday.maven.plugins</groupId>
         <artifactId>fsm-maven-plugin</artifactId>
         <configuration>
-            <configXml>${basedir}/target/extra-resources/fsm-plugin.xml</configXml>
             <prototypeXml>${basedir}/target/extra-resources/prototype.module.xml</prototypeXml>
+            <configXml>${basedir}/target/extra-resources/fsm-plugin.xml</configXml>
             <targetXml>${basedir}/target/extra-resources/module.xml</targetXml>
         </configuration>
         <executions>
@@ -31,57 +31,6 @@ Make sure you use maven 3.x.x or newer when integrating this plugin into your wo
         </executions>
     </plugin>
 ```
-
-## Config XML
-
-* In your config.xml you have to configure which folder or artifact should be included in your module descriptor.
-* Your config.xml could look like this:
-
-```
-    <?xml version="1.0" encoding="UTF-8"?>
-    <webforms-maven-plugin>
-        <scopes>
-            <scope>runtime</scope>
-            <scope>compile</scope>
-        </scopes>
-        <modules>
-            <module>
-                <id>com.monday.webforms.firstspirit:webforms-webapp:war</id>
-                <prefix>lib/</prefix>
-                <dependencyTagValueInXml>webforms-webapp-resources</dependencyTagValueInXml>
-                <firstSpiritScope>module</firstSpiritScope>
-                <resource>
-                    <web-xml>WEB-INF/web.xml</web-xml>
-                    <includes>
-                        <include>WEB-INF/**</include>
-                    </includes>
-                    <excludes>
-                        <exclude>WEB-INF/classes/</exclude>
-                        <exclude>WEB-INF/lib/</exclude>
-                    </excludes>
-                </resource>
-            </module>
-            <module>
-                <id>com.monday.webforms.analytics:webforms-reporting-webapp:war:${monday.webforms.backend.version}</id>
-                <prefix>external/reporting/WEB-INF/lib/</prefix>
-                <dependencyTagValueInXml>webforms-reporting-libs</dependencyTagValueInXml>
-                <firstSpiritScope>module</firstSpiritScope>
-                <resource>
-                    <prefix>external/reporting/</prefix>
-                    <web-xml>WEB-INF/web.xml</web-xml>
-                    <includes>
-                        <include>**</include>
-                    </includes>
-                    <excludes>
-                        <exclude>META-INF</exclude>
-                        <exclude>WEB-INF/lib/</exclude>
-                    </excludes>
-                </resource>
-            </module>
-        </modules>
-    </webforms-maven-plugin>
-```
-This example includes everything in the WEB-INF folder but excludes explicitly the folders WEB-INF/lib and WEB-INF/classes.
 
 ## Prototype XML
 
@@ -153,6 +102,57 @@ This example includes everything in the WEB-INF folder but excludes explicitly t
         </components>
     </module>
 ```
+
+## Config XML
+
+* In your config.xml you have to configure which folder or artifact should be included in your module descriptor.
+* Your config.xml could look like this:
+
+```
+    <?xml version="1.0" encoding="UTF-8"?>
+    <fsm-maven-plugin>
+        <scopes>
+            <scope>runtime</scope>
+            <scope>compile</scope>
+        </scopes>
+        <modules>
+            <module>
+                <id>com.monday.webforms.firstspirit:webforms-webapp:war</id>
+                <prefix>lib/</prefix>
+                <dependencyTagValueInXml>webforms-webapp-resources</dependencyTagValueInXml>
+                <firstSpiritScope>module</firstSpiritScope>
+                <resource>
+                    <web-xml>WEB-INF/web.xml</web-xml>
+                    <includes>
+                        <include>WEB-INF/**</include>
+                    </includes>
+                    <excludes>
+                        <exclude>WEB-INF/classes/</exclude>
+                        <exclude>WEB-INF/lib/</exclude>
+                    </excludes>
+                </resource>
+            </module>
+            <module>
+                <id>com.monday.webforms.analytics:webforms-reporting-webapp:war:${monday.webforms.backend.version}</id>
+                <prefix>external/reporting/WEB-INF/lib/</prefix>
+                <dependencyTagValueInXml>webforms-reporting-libs</dependencyTagValueInXml>
+                <firstSpiritScope>module</firstSpiritScope>
+                <resource>
+                    <prefix>external/reporting/</prefix>
+                    <web-xml>WEB-INF/web.xml</web-xml>
+                    <includes>
+                        <include>**</include>
+                    </includes>
+                    <excludes>
+                        <exclude>META-INF</exclude>
+                        <exclude>WEB-INF/lib/</exclude>
+                    </excludes>
+                </resource>
+            </module>
+        </modules>
+    </fsm-maven-plugin>
+```
+This example includes everything in the WEB-INF folder but excludes explicitly the folders WEB-INF/lib and WEB-INF/classes.
 
 ## Generated module XML
 
