@@ -1,4 +1,4 @@
-package com.monday.maven.plugins.fsm.util.resolver;
+package com.monday_consulting.maven.plugins.fsm.util.resolver;
 
 /*
 Copyright 2016 Monday Consulting GmbH
@@ -16,8 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import com.monday.maven.plugins.fsm.jaxb.ModuleType;
-import com.monday.maven.plugins.fsm.util.Module;
+import com.monday_consulting.maven.plugins.fsm.jaxb.ModuleType;
+import com.monday_consulting.maven.plugins.fsm.util.Module;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 

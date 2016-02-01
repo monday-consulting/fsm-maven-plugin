@@ -1,4 +1,4 @@
-package com.monday.maven.plugins.fsm.util;
+package com.monday_consulting.maven.plugins.fsm.util;
 
 /*
 Copyright 2016 Monday Consulting GmbH

@@ -1,4 +1,4 @@
-package com.monday.maven.plugins.fsm;
+package com.monday_consulting.maven.plugins.fsm;
 
 /*
 Copyright 2016 Monday Consulting GmbH
@@ -16,13 +16,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import com.monday.maven.plugins.fsm.jaxb.FsmMavenPluginType;
-import com.monday.maven.plugins.fsm.jaxb.ModuleType;
-import com.monday.maven.plugins.fsm.util.Module;
-import com.monday.maven.plugins.fsm.util.PrototypeXml;
-import com.monday.maven.plugins.fsm.util.XmlValidationEventHandler;
-import com.monday.maven.plugins.fsm.util.resolver.IResolver;
-import com.monday.maven.plugins.fsm.util.resolver.MavenGetArtifactsResolver;
+import com.monday_consulting.maven.plugins.fsm.jaxb.FsmMavenPluginType;
+import com.monday_consulting.maven.plugins.fsm.jaxb.ModuleType;
+import com.monday_consulting.maven.plugins.fsm.util.Module;
+import com.monday_consulting.maven.plugins.fsm.util.PrototypeXml;
+import com.monday_consulting.maven.plugins.fsm.util.XmlValidationEventHandler;
+import com.monday_consulting.maven.plugins.fsm.util.resolver.IResolver;
+import com.monday_consulting.maven.plugins.fsm.util.resolver.MavenGetArtifactsResolver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
