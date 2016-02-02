@@ -3,9 +3,24 @@
     <groupId>com.monday-consulting.maven.plugins</groupId>
     <artifactId>fsm-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>1.4.1-SNAPSHOT</version>
+    <version>1.4.0-SNAPSHOT</version>
     <name>fsm-maven-plugin</name>
     <url>http://www.monday-consulting.com</url>
+
+    <description>Maven plugin to generate XML descriptors for FirstSpirit modules.</description>
+    <developers>
+        <developer>
+            <id>kassimhoelting</id>
+            <name>Kassim Hoelting</name>
+            <email>k.hoelting@monday-consulting.com</email>
+            <organization>Monday Consulting GmbH</organization>
+            <organizationUrl>http://www.monday-consulting.com</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>Europe/Berlin</timezone>
+        </developer>
+    </developers>
 
     <scm>
         <connection>scm:git:git://github.com/monday-consulting/fsm-maven-plugin.git</connection>
