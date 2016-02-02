@@ -9,8 +9,8 @@
 
     <scm>
         <connection>scm:git:git://github.com/monday-consulting/fsm-maven-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com/monday-consulting/fsm-maven-plugin.git</developerConnection>
-        <url>http://github.com/monday-consulting/fsm-maven-plugin</url>
+        <developerConnection>scm:git:git@github.com:monday-consulting/fsm-maven-plugin.git</developerConnection>
+        <url>https://github.com/monday-consulting/fsm-maven-plugin</url>
       <tag>v1.4</tag>
   </scm>
 
