@@ -6,6 +6,19 @@ Make sure you use maven 3.x.x or newer when integrating this plugin into your wo
 
 # Getting started
 
+## Maven Dependency
+
+We published our plugin to the maven central repository.
+You could include it into your workspace with the following maven dependency:
+
+```
+    <dependency>
+      <groupId>com.monday-consulting.maven.plugins</groupId>
+      <artifactId>fsm-maven-plugin</artifactId>
+      <version>1.4.0</version>
+    </dependency>
+```
+
 ## Plugin Configuration
 
 * You have to configure the plugin with an prototype.xml, the config.xml and a target.
