@@ -99,10 +99,12 @@ public class Module {
 
     private Xpp3Dom getWebResourceTmpDom(final String name, final String dirPath) {
         final Xpp3Dom tmpDom = new Xpp3Dom("resource");
-        tmpDom.setAttribute("target", "/" + dirPath);
+        // fix windows paths to work with FirstSpirit module loader
+        tmpDom.setAttribute("target", "/" + dirPath.replace("\\", "/"));
         String prefix = getResource().getPrefix();
         prefix = prefix == null ? "" : prefix;
-        tmpDom.setValue(prefix + name);
+        final String value = prefix + name;
+        tmpDom.setValue(value.replace("\\", "/"));
         return tmpDom;
     }
 
@@ -265,7 +267,7 @@ public class Module {
 
             for (final String incl : ds.getIncludedFiles()) {
 
-                final int indexOf = incl.lastIndexOf("/");
+                final int indexOf = incl.lastIndexOf(File.separator);
                 String dir = "";
                 if (indexOf > 0) {
                     dir = incl.substring(0, indexOf);
