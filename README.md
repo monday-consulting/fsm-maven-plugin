@@ -6,7 +6,7 @@ Make sure you use maven 3.x.x or newer when integrating this plugin into your wo
 
 # Getting started
 
-## Maven Dependency
+## Maven Dependency [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.monday-consulting.maven.plugins/fsm-maven-plugin/badge.svg?style=flat)](http://mvnrepository.com/artifact/com.monday-consulting.maven.plugins/fsm-maven-plugin)
 
 We published our plugin to the maven central repository.
 You could include it into your workspace with the following maven dependency:
