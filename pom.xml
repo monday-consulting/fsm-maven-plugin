@@ -52,6 +52,8 @@
     </licenses>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <mavenVersion>3.3.9</mavenVersion>
         <eclipseAetherVersion>1.1.0</eclipseAetherVersion>
     </properties>
