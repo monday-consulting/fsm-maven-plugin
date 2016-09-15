@@ -51,19 +51,68 @@
         </license>
     </licenses>
 
+    <prerequisites>
+        <maven>3.1.0</maven>
+    </prerequisites>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <mavenVersion>3.3.9</mavenVersion>
         <eclipseAetherVersion>1.1.0</eclipseAetherVersion>
+
+        <maven.plugin.plugin>3.5</maven.plugin.plugin>
+        <maven.jaxb2.plugin>1.5</maven.jaxb2.plugin>
+        <maven.resources.plugin>3.0.1</maven.resources.plugin>
+        <maven.release.plugin>2.5.3</maven.release.plugin>
+        <maven.gpg.plugin>1.6</maven.gpg.plugin>
+        <maven.clean.plugin>3.0.0</maven.clean.plugin>
+        <maven.compiler.plugin>3.5.1</maven.compiler.plugin>
+        <maven.jar.plugin>3.0.2</maven.jar.plugin>
     </properties>
 
     <build>
+        <pluginManagement>
+            <plugins>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${maven.clean.plugin}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin}</version>
+                    <configuration>
+                        <source>1.6</source>
+                        <target>1.6</target>
+                        <showWarnings>true</showWarnings>
+                        <showDeprecation>true</showDeprecation>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven.jar.plugin}</version>
+                    <configuration>
+                        <archive>
+                            <manifestEntries>
+                                <Built-By>Monday Consulting GmbH</Built-By>
+                            </manifestEntries>
+                        </archive>
+                    </configuration>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>1.5</version>
+                <version>${maven.jaxb2.plugin}</version>
                 <executions>
                     <execution>
                         <id>xjc</id>
@@ -81,7 +130,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.6</version>
+                <version>${maven.resources.plugin}</version>
                 <executions>
                     <execution>
                         <id>copy-resources</id>
@@ -104,7 +153,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.4</version>
+                <version>${maven.plugin.plugin}</version>
                 <executions>
                     <execution>
                         <id>default-descriptor</id>
@@ -115,7 +164,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
+                <version>${maven.release.plugin}</version>
                 <configuration>
                     <arguments>-Dgpg.passphrase=${gpg.passphrase}</arguments>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
@@ -185,7 +234,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
+                        <version>${maven.gpg.plugin}</version>
                         <configuration>
                             <passphrase>${gpg.passphrase}</passphrase>
                         </configuration>
