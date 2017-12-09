@@ -53,8 +53,8 @@
 
     <xs:complexType name="resource">
         <xs:all>
-            <xs:element type="xs:string" name="prefix" minOccurs="1"/>
-            <xs:element type="xs:string" name="web-xml" minOccurs="1"/>
+            <xs:element type="xs:string" name="prefix" minOccurs="0"/>
+            <xs:element type="xs:string" name="web-xml" minOccurs="0"/>
             <xs:element type="includes" name="includes" maxOccurs="1"/>
             <xs:element type="excludes" name="excludes" maxOccurs="1"/>
         </xs:all>
