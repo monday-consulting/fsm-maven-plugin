@@ -40,7 +40,7 @@
     </xs:complexType>
 
     <xs:complexType name="moduleType">
-        <xs:sequence>
+        <xs:all>
             <xs:element type="xs:string" name="id"/>
             <xs:element type="xs:string" name="prefix"/>
             <xs:element type="resource" name="resource" minOccurs="0"/>
@@ -48,16 +48,16 @@
             <xs:element type="xs:string" name="firstSpiritScope"/>
             <xs:element type="includesType" name="includes" minOccurs="0"/>
             <xs:element type="excludesType" name="excludes" minOccurs="0"/>
-        </xs:sequence>
+        </xs:all>
     </xs:complexType>
 
     <xs:complexType name="resource">
-        <xs:sequence>
-            <xs:element type="xs:string" name="prefix" minOccurs="1"/>
-            <xs:element type="xs:string" name="web-xml" minOccurs="1"/>
+        <xs:all>
+            <xs:element type="xs:string" name="prefix" minOccurs="0"/>
+            <xs:element type="xs:string" name="web-xml" minOccurs="0"/>
             <xs:element type="includes" name="includes" maxOccurs="1"/>
             <xs:element type="excludes" name="excludes" maxOccurs="1"/>
-        </xs:sequence>
+        </xs:all>
     </xs:complexType>
 
     <xs:complexType name="includes">
