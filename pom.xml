@@ -237,6 +237,7 @@
                         <version>${maven.gpg.plugin}</version>
                         <configuration>
                             <passphrase>${gpg.passphrase}</passphrase>
+                            <keyname>${gpg.keyname}</keyname>
                         </configuration>
                         <executions>
                             <execution>
