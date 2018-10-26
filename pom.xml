@@ -4,9 +4,9 @@
     <groupId>com.monday-consulting.maven.plugins</groupId>
     <artifactId>fsm-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>1.4.2</version>
+    <version>1.5.0</version>
     <name>fsm-maven-plugin</name>
-    <url>http://www.monday-consulting.com</url>
+    <url>https://www.monday-consulting.com</url>
 
     <description>Maven plugin to generate XML descriptors for FirstSpirit modules.</description>
     <developers>
@@ -57,17 +57,20 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <compile.source.jdk>1.8</compile.source.jdk>
+        <compile.target.jdk>1.8</compile.target.jdk>
+
         <mavenVersion>3.3.9</mavenVersion>
         <eclipseAetherVersion>1.1.0</eclipseAetherVersion>
 
-        <maven.plugin.plugin>3.5</maven.plugin.plugin>
+        <maven.plugin.plugin>3.5.2</maven.plugin.plugin>
         <maven.sonatype.nexus.plugin>1.6.8</maven.sonatype.nexus.plugin>
         <maven.jaxb2.plugin>1.5</maven.jaxb2.plugin>
-        <maven.resources.plugin>3.0.1</maven.resources.plugin>
+        <maven.resources.plugin>3.1.0</maven.resources.plugin>
         <maven.gpg.plugin>1.6</maven.gpg.plugin>
-        <maven.clean.plugin>3.0.0</maven.clean.plugin>
-        <maven.compiler.plugin>3.5.1</maven.compiler.plugin>
-        <maven.jar.plugin>3.0.2</maven.jar.plugin>
+        <maven.clean.plugin>3.1.0</maven.clean.plugin>
+        <maven.compiler.plugin>3.8.0</maven.compiler.plugin>
+        <maven.jar.plugin>3.1.0</maven.jar.plugin>
     </properties>
 
     <build>
@@ -85,8 +88,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven.compiler.plugin}</version>
                     <configuration>
-                        <source>1.6</source>
-                        <target>1.6</target>
+                        <source>${compile.source.jdk}</source>
+                        <target>${compile.target.jdk}</target>
                         <showWarnings>true</showWarnings>
                         <showDeprecation>true</showDeprecation>
                     </configuration>
@@ -178,6 +181,11 @@
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
             <version>3.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>2.3.1</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.aether</groupId>
