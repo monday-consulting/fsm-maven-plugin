@@ -1,7 +1,7 @@
 package com.monday_consulting.maven.plugins.fsm.util;
 
 /*
-Copyright 2016 Monday Consulting GmbH
+Copyright 2016-2019 Monday Consulting GmbH
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -38,8 +38,8 @@ import java.util.*;
  * This object should represent a configuration via the fsm-plugin.xml.
  * It should be used to configure the FirstSpirit module components.
  *
+ * @author Marcel Scheland
  * @author Kassim Hölting
- * @author Hannes Thielker
  * @since 1.0.0
  */
 public class Module {
@@ -64,30 +64,27 @@ public class Module {
      * @param log        The logger.
      * @param moduleType The module component configuration.
      * @param scopes     The dependency scopes that will be included (like compile, runtime).
-     * @throws MojoFailureException   in case of configuration or extracting problems.
      * @throws MojoExecutionException in case of a general failures.
      */
-    public Module(final Log log, final ModuleType moduleType, final List<String> scopes) throws MojoFailureException, MojoExecutionException {
+    public Module(final Log log, final ModuleType moduleType, final List<String> scopes) throws MojoExecutionException {
         this.log = log;
         this.moduleType = moduleType;
         final String[] coords = moduleType.getId().split(":");
-        if (coords.length < 1) {
+
+        if (coords.length == 0) {
             throw new MojoExecutionException("Module-Construction failed: artifactString <=> artifact-coords are empty");
         }
-
-        if (coords.length >= 1) {
-            groupId = coords[0];
-        }
-        if (coords.length >= 2) {
+        groupId = coords[0];
+        if (coords.length > 1) {
             artifactId = coords[1];
         }
-        if (coords.length >= 3) {
+        if (coords.length > 2) {
             type = coords[2];
         }
-        if (coords.length >= 4) {
+        if (coords.length > 3) {
             version = coords[3];
         }
-        if (coords.length >= 5) {
+        if (coords.length > 4) {
             classifier = coords[4];
         }
 
@@ -137,6 +134,8 @@ public class Module {
             if (moduleType.getFirstSpiritScope() != null && !moduleType.getFirstSpiritScope().isEmpty()) {
                 tmpDom.setAttribute("scope", moduleType.getFirstSpiritScope().trim());
             }
+            tmpDom.setAttribute("name", artifact.getGroupId() + ":" + artifact.getArtifactId());
+            tmpDom.setAttribute("version", artifact.getVersion());
 
             final ExcludeType excludeType = excludes.get(artifact.getArtifactId());
             final IncludeType includeType = includes.get(artifact.getArtifactId());
@@ -183,7 +182,7 @@ public class Module {
     }
 
     private Map<String, ExcludeType> getExcludes(Map<String, IncludeType> includes) throws MojoFailureException {
-        final Map<String, ExcludeType> excludes = new HashMap<String, ExcludeType>();
+        final Map<String, ExcludeType> excludes = new HashMap<>();
         if (moduleType.getExcludes() != null) {
             for (ExcludeType excludeType : moduleType.getExcludes().getExclude()) {
                 if (Boolean.valueOf(excludeType.getOverrideIncludes()) && includes.containsKey(excludeType.getArtifactId())) {
@@ -200,7 +199,7 @@ public class Module {
     }
 
     private Map<String, IncludeType> getIncludes() throws MojoFailureException {
-        final Map<String, IncludeType> includes = new HashMap<String, IncludeType>();
+        final Map<String, IncludeType> includes = new HashMap<>();
         if (moduleType.getIncludes() != null) {
             for (IncludeType includeType : moduleType.getIncludes().getInclude()) {
                 if (includes.containsKey(includeType.getArtifactId())) {
@@ -213,7 +212,7 @@ public class Module {
     }
 
     private List<Artifact> getFilteredModuleArtifacts(List<Artifact> resolvedModuleArtifacts) {
-        final List<Artifact> filteredModuleArtifacts = new ArrayList<Artifact>();
+        final List<Artifact> filteredModuleArtifacts = new ArrayList<>();
         log.info("Plugin will include dependencies with scope null for the project-artifact itself and with user defined scopes: " + Arrays.toString(dependencyScopes.toArray()));
         for (final Artifact resolvedModuleArtifact : resolvedModuleArtifacts) {
             if (dependencyScopes.contains(resolvedModuleArtifact.getScope()) || resolvedModuleArtifact.getScope() == null) {
@@ -254,13 +253,13 @@ public class Module {
             }
 
             final List<String> includes = resource.getIncludes().getInclude();
-            final List<String> excludes = resource.getExcludes() != null ? resource.getExcludes().getExclude() : new ArrayList<String>();
+            final List<String> excludes = resource.getExcludes() != null ? resource.getExcludes().getExclude() : new ArrayList<>();
             // always exclude web.xml
             excludes.add(resource.getWebXml());
 
             DirectoryScanner ds = new DirectoryScanner();
-            ds.setIncludes(includes.toArray(new String[includes.size()]));
-            ds.setExcludes(excludes.toArray(new String[excludes.size()]));
+            ds.setIncludes(includes.toArray(new String[0]));
+            ds.setExcludes(excludes.toArray(new String[0]));
             ds.setBasedir(baseDir);
             ds.setCaseSensitive(true);
             ds.scan();
@@ -313,7 +312,7 @@ public class Module {
         return classifier;
     }
 
-    public String getPrefix() {
+    private String getPrefix() {
         return prefix;
     }
 
@@ -321,11 +320,11 @@ public class Module {
         return dependencyTagValueInXml;
     }
 
-    public Resource getResource() {
+    private Resource getResource() {
         return resource;
     }
 
-    public MavenProject getProject() {
+    private MavenProject getProject() {
         return project;
     }
 

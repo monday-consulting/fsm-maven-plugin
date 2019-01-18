@@ -1,7 +1,7 @@
 package com.monday_consulting.maven.plugins.fsm.util;
 
 /*
-Copyright 2016 Monday Consulting GmbH
+Copyright 2016-2019 Monday Consulting GmbH
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,12 +30,12 @@ import java.util.LinkedList;
  * @author Kassim Hölting
  * @since 1.0.0
  */
-public class Xpp3DomIterator implements Iterator<Xpp3Dom>, Iterable<Xpp3Dom> {
+class Xpp3DomIterator implements Iterator<Xpp3Dom>, Iterable<Xpp3Dom> {
+    private final LinkedList<Xpp3Dom> list = new LinkedList<>();
     private Xpp3Dom root;
-    private LinkedList<Xpp3Dom> list = new LinkedList<Xpp3Dom>();
     private Xpp3Dom current;
 
-    public Xpp3DomIterator(final Xpp3Dom dom) {
+    Xpp3DomIterator(final Xpp3Dom dom) {
         this.root = dom;
         list.add(root);
     }
@@ -52,9 +52,7 @@ public class Xpp3DomIterator implements Iterator<Xpp3Dom>, Iterable<Xpp3Dom> {
      */
     public Xpp3Dom next() {
         if (current == null) {
-            if (list.isEmpty()) {
-                current = null;
-            } else {
+            if (!list.isEmpty()) {
                 current = list.pop();
             }
         } else {

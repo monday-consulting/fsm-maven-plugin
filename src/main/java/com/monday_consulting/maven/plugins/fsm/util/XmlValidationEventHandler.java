@@ -1,7 +1,7 @@
 package com.monday_consulting.maven.plugins.fsm.util;
 
 /*
-Copyright 2016 Monday Consulting GmbH
+Copyright 2016-2019 Monday Consulting GmbH
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import javax.xml.bind.ValidationEventHandler;
  * Handler for the xml validation.
  *
  * @author Kassim Hölting
- * @author Hannes Thielker
  * @since 1.0.0
  */
 public class XmlValidationEventHandler implements ValidationEventHandler {

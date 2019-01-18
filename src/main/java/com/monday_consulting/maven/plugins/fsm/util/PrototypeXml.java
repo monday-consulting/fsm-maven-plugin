@@ -1,7 +1,7 @@
 package com.monday_consulting.maven.plugins.fsm.util;
 
 /*
-Copyright 2016 Monday Consulting GmbH
+Copyright 2016-2019 Monday Consulting GmbH
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@ import java.util.Map;
  * Encapsulates the prototype-xml-file.
  *
  * @author Kassim Hölting
- * @author Hannes Thielker
  * @since 1.0.0
  */
 public class PrototypeXml {
@@ -42,7 +41,7 @@ public class PrototypeXml {
     private Xpp3Dom prototypeDom;
 
     public PrototypeXml(final Log log, final File prototypeXml) throws XmlPullParserException, IOException {
-        this.dependencyJointList = new ArrayList<PrototypeXml.DependencyJoint>();
+        this.dependencyJointList = new ArrayList<>();
         this.log = log;
         this.prototypeDom = Xpp3DomBuilder.build(new XmlStreamReader(prototypeXml));
         if (log.isDebugEnabled())
@@ -116,17 +115,17 @@ public class PrototypeXml {
         private final String dependencyTagValue;
         private final Xpp3Dom root;
 
-        public DependencyJoint(final String dependencyTagValue, final Xpp3Dom root) {
+        DependencyJoint(final String dependencyTagValue, final Xpp3Dom root) {
             super();
             this.dependencyTagValue = dependencyTagValue;
             this.root = root;
         }
 
-        public String getDependencyTagValue() {
+        String getDependencyTagValue() {
             return dependencyTagValue;
         }
 
-        public Xpp3Dom getRoot() {
+        Xpp3Dom getRoot() {
             return root;
         }
     }
