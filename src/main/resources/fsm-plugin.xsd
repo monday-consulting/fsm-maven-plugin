@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+<xs:schema elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xs:element name="fsm-maven-plugin" type="fsm-maven-pluginType">
@@ -18,7 +18,7 @@
 
     <xs:complexType name="scopesType">
         <xs:sequence>
-            <xs:element name="scope" maxOccurs="unbounded" minOccurs="1">
+            <xs:element name="scope" maxOccurs="unbounded">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
                         <xs:enumeration value="compile"/>
@@ -35,7 +35,7 @@
 
     <xs:complexType name="modulesType">
         <xs:sequence>
-            <xs:element type="moduleType" name="module" maxOccurs="unbounded" minOccurs="1"/>
+            <xs:element type="moduleType" name="module" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -55,26 +55,26 @@
         <xs:all>
             <xs:element type="xs:string" name="prefix" minOccurs="0"/>
             <xs:element type="xs:string" name="web-xml" minOccurs="0"/>
-            <xs:element type="includes" name="includes" maxOccurs="1"/>
-            <xs:element type="excludes" name="excludes" maxOccurs="1"/>
+            <xs:element type="includes" name="includes"/>
+            <xs:element type="excludes" name="excludes"/>
         </xs:all>
     </xs:complexType>
 
     <xs:complexType name="includes">
         <xs:sequence>
-            <xs:element type="xs:string" name="include" maxOccurs="unbounded" minOccurs="1"/>
+            <xs:element type="xs:string" name="include" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="excludes">
         <xs:sequence>
-            <xs:element type="xs:string" name="exclude" maxOccurs="unbounded" minOccurs="1"/>
+            <xs:element type="xs:string" name="exclude" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="includesType">
         <xs:sequence>
-            <xs:element type="includeType" name="include" maxOccurs="unbounded" minOccurs="1"/>
+            <xs:element type="includeType" name="include" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -89,7 +89,7 @@
 
     <xs:complexType name="excludesType">
         <xs:sequence>
-            <xs:element type="excludeType" name="exclude" maxOccurs="unbounded" minOccurs="1"/>
+            <xs:element type="excludeType" name="exclude" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 

@@ -21,6 +21,17 @@
             </roles>
             <timezone>Europe/Berlin</timezone>
         </developer>
+        <developer>
+            <id>mschel</id>
+            <name>Marcel Scheland</name>
+            <email>m.scheland@monday-consulting.com</email>
+            <organization>Monday Consulting GmbH</organization>
+            <organizationUrl>http://www.monday-consulting.com</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>Europe/Berlin</timezone>
+        </developer>
     </developers>
 
     <scm>

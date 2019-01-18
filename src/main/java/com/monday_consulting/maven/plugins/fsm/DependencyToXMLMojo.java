@@ -1,7 +1,7 @@
 package com.monday_consulting.maven.plugins.fsm;
 
 /*
-Copyright 2016 Monday Consulting GmbH
+Copyright 2016-2019 Monday Consulting GmbH
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -61,23 +61,22 @@ import java.util.Map;
  * You have to configure a config.xml, prototype.xml and the target.xml.
  * For example:
  * <configuration>
- *  <configXml>${basedir}/target/extra-resources/fsm-plugin.xml</configXml>
- *  <prototypeXml>${basedir}/target/extra-resources/prototype.module.xml</prototypeXml>
- *  <targetXml>${basedir}/target/extra-resources/module.xml</targetXml>
+ * <configXml>${basedir}/target/extra-resources/fsm-plugin.xml</configXml>
+ * <prototypeXml>${basedir}/target/extra-resources/prototype.module.xml</prototypeXml>
+ * <targetXml>${basedir}/target/extra-resources/module.xml</targetXml>
  * </configuration>
  * <p/>
  * This mojo will automatically resolve your maven project dependencies via reactor or your maven repositories and
  * will write them to your module descriptor XML.
  *
  * @author Kassim Hölting
- * @author Hannes Thielker
  * @since 1.0.0
  */
 @Mojo(name = "dependencyToXML",
         defaultPhase = LifecyclePhase.PACKAGE,
         aggregator = true,
         requiresDependencyResolution = ResolutionScope.COMPILE)
-public class DependencyToXMLMojo extends AbstractMojo {
+class DependencyToXMLMojo extends AbstractMojo {
 
     /**
      * The entry point to Aether, i.e. the component doing all the work.
@@ -147,7 +146,7 @@ public class DependencyToXMLMojo extends AbstractMojo {
                 getLog().debug("Enhance created Modules");
             }
             final IResolver resolver = new MavenGetArtifactsResolver(getLog(), reactorProjects, repoSystem, repoSession, projectBuilder, mavenProject);
-            final Map<String, Module> modules = new HashMap<String, Module>();
+            final Map<String, Module> modules = new HashMap<>();
             for (final ModuleType moduleType : config.getModules().getModule()) {
                 if (modules.containsKey(moduleType.getDependencyTagValueInXml())) {
                     throw new MojoFailureException("Properties for Module: " + moduleType.getDependencyTagValueInXml() +
@@ -170,9 +169,7 @@ public class DependencyToXMLMojo extends AbstractMojo {
                 getLog().debug("Dependencies written to Module-XML:\n\t" + prototype.getPrototypeDom().toString());
 
             getLog().info("***DependencyToXMLMojo finished");
-        } catch (XmlPullParserException e) {
-            throw new MojoExecutionException(e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (XmlPullParserException | IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
     }
@@ -210,7 +207,7 @@ public class DependencyToXMLMojo extends AbstractMojo {
      *
      * @param configXml The config-file to use
      * @return WebformsMavenPluginType  The corresponding Java-Object of the plugin-configuration.
-     * @throws MojoExecutionException   in case of marshalling exception for the fsm-plugin.xsd.
+     * @throws MojoExecutionException in case of marshalling exception for the fsm-plugin.xsd.
      */
     private FsmMavenPluginType bindXmlConfigToPojo(final File configXml) throws MojoExecutionException {
         getLog().debug("***Constructing ConfigXml-Object");
@@ -236,9 +233,9 @@ public class DependencyToXMLMojo extends AbstractMojo {
     /**
      * Write a DOM-Tree to a target file.
      *
-     * @param target    File to write to.
-     * @param dom       dom to write to file.
-     * @throws IOException  in case of unexpected writer exceptions.
+     * @param target File to write to.
+     * @param dom    dom to write to file.
+     * @throws IOException in case of unexpected writer exceptions.
      */
     private void writeDomToTarget(final File target, final Xpp3Dom dom) throws IOException {
         if (getLog().isDebugEnabled())
