@@ -237,6 +237,12 @@ public class Module {
             if (!baseDir.exists()) {
                 final File artifactFile = project.getArtifact().getFile();
                 final ZipFile fileToExtract = new ZipFile(artifactFile);
+                if (!fileToExtract.isValidZipFile()) {
+                    throw new ZipException("No valid ZIP File: " + project.getArtifact().getFile());
+                }
+                if (fileToExtract.isEncrypted()) {
+                    throw new ZipException("The ZIP File is Password encrypted: " + project.getArtifact().getFile());
+                }
                 baseDir = new File(project.getParent().getBasedir().getAbsolutePath() + targetFileDir);
                 fileToExtract.extractAll(baseDir.getAbsolutePath());
             }
