@@ -248,13 +248,14 @@ public class Module {
             }
 
             final Resource resource = getResource();
-            if (resource == null) {
-                throw new MojoFailureException("Module " + project.getArtifactId() + " from archive type " + project.getArtifact().getType() + " detected. No <resource> configuration found");
-            } else if (resource.getPrefix() == null || resource.getPrefix().isEmpty()) {
+            if (resource == null || resource.getIncludes() == null || resource.getIncludes().getInclude().isEmpty()) {
+                // if there are no resources or includes then there are no files to handle
+                return;
+            }
+            if (resource.getPrefix() == null || resource.getPrefix().isEmpty()) {
                 log.warn("No <prefix> defined. Prefix would be set to root");
-            } else if (resource.getIncludes() == null || resource.getIncludes().getInclude() == null || resource.getIncludes().getInclude().isEmpty()) {
-                throw new MojoFailureException("Module " + project.getArtifactId() + " from archive type " + project.getArtifact().getType() + " detected. No <includes> configured");
-            } else if (resource.getWebXml() == null || resource.getWebXml().isEmpty()) {
+            }
+            if (resource.getWebXml() == null || resource.getWebXml().isEmpty()) {
                 throw new MojoFailureException("Module " + project.getArtifactId() + " from archive type " + project.getArtifact().getType() + " detected. No <web-xml> defined");
             }
 
