@@ -46,6 +46,7 @@
             <xs:element type="resource" name="resource" minOccurs="0"/>
             <xs:element type="xs:string" name="dependencyTagValueInXml"/>
             <xs:element type="xs:string" name="firstSpiritScope"/>
+            <xs:element type="xs:string" name="firstSpiritMode" minOccurs="0"/>
             <xs:element type="includesType" name="includes" minOccurs="0"/>
             <xs:element type="excludesType" name="excludes" minOccurs="0"/>
         </xs:all>

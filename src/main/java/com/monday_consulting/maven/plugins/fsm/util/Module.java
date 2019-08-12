@@ -134,6 +134,9 @@ public class Module {
             if (moduleType.getFirstSpiritScope() != null && !moduleType.getFirstSpiritScope().isEmpty()) {
                 tmpDom.setAttribute("scope", moduleType.getFirstSpiritScope().trim());
             }
+            if (moduleType.getFirstSpiritMode() != null && !moduleType.getFirstSpiritMode().isEmpty()) {
+                tmpDom.setAttribute("mode", moduleType.getFirstSpiritMode().trim());
+            }
             tmpDom.setAttribute("name", artifact.getGroupId() + ":" + artifact.getArtifactId());
             tmpDom.setAttribute("version", artifact.getVersion());
 
@@ -166,9 +169,12 @@ public class Module {
             log.info("Artifact: " + includeType.getArtifactId() + " included");
             final Xpp3Dom tmpDom = new Xpp3Dom("resource");
 
-            //set firstSpiritScope
+            // set firstSpiritScope & firstSpiritMode
             if (moduleType.getFirstSpiritScope() != null && !moduleType.getFirstSpiritScope().isEmpty()) {
                 tmpDom.setAttribute("scope", moduleType.getFirstSpiritScope().trim());
+            }
+            if (moduleType.getFirstSpiritMode() != null && !moduleType.getFirstSpiritMode().isEmpty()) {
+                tmpDom.setAttribute("mode", moduleType.getFirstSpiritMode().trim());
             }
 
             tmpDom.setValue(getPrefix() + includeType.getFileName());
