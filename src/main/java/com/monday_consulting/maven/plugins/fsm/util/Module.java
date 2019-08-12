@@ -134,6 +134,9 @@ public class Module {
             if (moduleType.getFirstSpiritScope() != null && !moduleType.getFirstSpiritScope().isEmpty()) {
                 tmpDom.setAttribute("scope", moduleType.getFirstSpiritScope().trim());
             }
+            if (moduleType.getFirstSpiritMode() != null && !moduleType.getFirstSpiritMode().isEmpty()) {
+                tmpDom.setAttribute("mode", moduleType.getFirstSpiritMode().trim());
+            }
             tmpDom.setAttribute("name", artifact.getGroupId() + ":" + artifact.getArtifactId());
             tmpDom.setAttribute("version", artifact.getVersion());
 
@@ -166,9 +169,12 @@ public class Module {
             log.info("Artifact: " + includeType.getArtifactId() + " included");
             final Xpp3Dom tmpDom = new Xpp3Dom("resource");
 
-            //set firstSpiritScope
+            // set firstSpiritScope & firstSpiritMode
             if (moduleType.getFirstSpiritScope() != null && !moduleType.getFirstSpiritScope().isEmpty()) {
                 tmpDom.setAttribute("scope", moduleType.getFirstSpiritScope().trim());
+            }
+            if (moduleType.getFirstSpiritMode() != null && !moduleType.getFirstSpiritMode().isEmpty()) {
+                tmpDom.setAttribute("mode", moduleType.getFirstSpiritMode().trim());
             }
 
             tmpDom.setValue(getPrefix() + includeType.getFileName());
@@ -237,18 +243,25 @@ public class Module {
             if (!baseDir.exists()) {
                 final File artifactFile = project.getArtifact().getFile();
                 final ZipFile fileToExtract = new ZipFile(artifactFile);
+                if (!fileToExtract.isValidZipFile()) {
+                    throw new ZipException("No valid ZIP File: " + project.getArtifact().getFile());
+                }
+                if (fileToExtract.isEncrypted()) {
+                    throw new ZipException("The ZIP File is Password encrypted: " + project.getArtifact().getFile());
+                }
                 baseDir = new File(project.getParent().getBasedir().getAbsolutePath() + targetFileDir);
                 fileToExtract.extractAll(baseDir.getAbsolutePath());
             }
 
             final Resource resource = getResource();
-            if (resource == null) {
-                throw new MojoFailureException("Module " + project.getArtifactId() + " from archive type " + project.getArtifact().getType() + " detected. No <resource> configuration found");
-            } else if (resource.getPrefix() == null || resource.getPrefix().isEmpty()) {
+            if (resource == null || resource.getIncludes() == null || resource.getIncludes().getInclude().isEmpty()) {
+                // if there are no resources or includes then there are no files to handle
+                return;
+            }
+            if (resource.getPrefix() == null || resource.getPrefix().isEmpty()) {
                 log.warn("No <prefix> defined. Prefix would be set to root");
-            } else if (resource.getIncludes() == null || resource.getIncludes().getInclude() == null || resource.getIncludes().getInclude().isEmpty()) {
-                throw new MojoFailureException("Module " + project.getArtifactId() + " from archive type " + project.getArtifact().getType() + " detected. No <includes> configured");
-            } else if (resource.getWebXml() == null || resource.getWebXml().isEmpty()) {
+            }
+            if (resource.getWebXml() == null || resource.getWebXml().isEmpty()) {
                 throw new MojoFailureException("Module " + project.getArtifactId() + " from archive type " + project.getArtifact().getType() + " detected. No <web-xml> defined");
             }
 
