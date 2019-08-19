@@ -113,8 +113,8 @@ public class Module {
      */
     public void setResolvedModuleArtifacts(final List<Artifact> resolvedModuleArtifacts) throws MojoFailureException {
         this.resolvedModuleArtifacts = resolvedModuleArtifacts;
-        final boolean isJarArtifact = getProject().getArtifact().getType().equals("jar");
-        if (isJarArtifact) {
+        final String artifactType = getProject().getArtifact().getType();
+        if (artifactType.equals("jar")) {
             if (project == null) {
                 throw new MojoFailureException("For this module no maven project was set.");
             }
@@ -122,10 +122,10 @@ public class Module {
                     ", with absolute-file: " + project.getArtifact().getFile().getAbsoluteFile() + "; finalname: " + project.getBuild().getFinalName());
             resolvedModuleArtifacts.add(project.getArtifact());
         }
-        moduleDependencyDom = fillDependenciesXml(isJarArtifact, getFilteredModuleArtifacts(resolvedModuleArtifacts), getIncludes(), getExcludes(getIncludes()));
+        moduleDependencyDom = fillDependenciesXml(artifactType, getFilteredModuleArtifacts(resolvedModuleArtifacts), getIncludes(), getExcludes(getIncludes()));
     }
 
-    private Xpp3Dom fillDependenciesXml(boolean isJarArtifact, List<Artifact> filteredModuleArtifacts, Map<String, IncludeType> includes, Map<String, ExcludeType> excludes) throws MojoFailureException {
+    private Xpp3Dom fillDependenciesXml(String artifactType, List<Artifact> filteredModuleArtifacts, Map<String, IncludeType> includes, Map<String, ExcludeType> excludes) throws MojoFailureException {
         //create Xpp3Dom out of the dependency-list
         final Xpp3Dom dom = new Xpp3Dom("root");
         for (final Artifact artifact : filteredModuleArtifacts) {
@@ -181,7 +181,7 @@ public class Module {
             dom.addChild(tmpDom);
         }
 
-        if (!isJarArtifact) {
+        if (artifactType.equals("war") || artifactType.equals("zip")) {
             handleArchiveFileIncludes(dom);
         }
         return dom;
