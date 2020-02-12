@@ -81,7 +81,7 @@
         <maven.gpg.plugin>1.6</maven.gpg.plugin>
         <maven.clean.plugin>3.1.0</maven.clean.plugin>
         <maven.compiler.plugin>3.8.1</maven.compiler.plugin>
-        <maven.jar.plugin>3.1.2</maven.jar.plugin>
+        <maven.jar.plugin>3.2.0</maven.jar.plugin>
     </properties>
 
     <build>
