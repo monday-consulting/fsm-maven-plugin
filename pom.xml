@@ -4,7 +4,7 @@
     <groupId>com.monday-consulting.maven.plugins</groupId>
     <artifactId>fsm-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>1.5.3</version>
+    <version>1.6.0</version>
     <name>fsm-maven-plugin</name>
     <url>https://www.monday-consulting.com</url>
 
@@ -25,6 +25,17 @@
             <id>mschel</id>
             <name>Marcel Scheland</name>
             <email>m.scheland@monday-consulting.com</email>
+            <organization>Monday Consulting GmbH</organization>
+            <organizationUrl>http://www.monday-consulting.com</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>Europe/Berlin</timezone>
+        </developer>
+        <developer>
+            <id>odegener</id>
+            <name>Oliver Degener</name>
+            <email>o.degener@monday-consulting.com</email>
             <organization>Monday Consulting GmbH</organization>
             <organizationUrl>http://www.monday-consulting.com</organizationUrl>
             <roles>
@@ -81,7 +92,7 @@
         <maven.gpg.plugin>1.6</maven.gpg.plugin>
         <maven.clean.plugin>3.1.0</maven.clean.plugin>
         <maven.compiler.plugin>3.8.1</maven.compiler.plugin>
-        <maven.jar.plugin>3.1.2</maven.jar.plugin>
+        <maven.jar.plugin>3.2.0</maven.jar.plugin>
     </properties>
 
     <build>
