@@ -32,6 +32,17 @@
             </roles>
             <timezone>Europe/Berlin</timezone>
         </developer>
+        <developer>
+            <id>odegener</id>
+            <name>Oliver Degener</name>
+            <email>o.degener@monday-consulting.com</email>
+            <organization>Monday Consulting GmbH</organization>
+            <organizationUrl>http://www.monday-consulting.com</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>Europe/Berlin</timezone>
+        </developer>
     </developers>
 
     <scm>
