@@ -185,17 +185,16 @@ class DependencyToXMLMojo extends AbstractMojo {
                     "\ngroudId:    " + reactorProject.getGroupId() +
                     "\nartifactId: " + reactorProject.getArtifactId() +
                     "\nversion:    " + reactorProject.getVersion();
-            if (getLog().isDebugEnabled())
-                getLog().debug(msg);
+
+            getLog().debug(msg);
 
             if (reactorProject.getArtifacts() == null || reactorProject.getArtifacts().isEmpty()) {
-                if (getLog().isDebugEnabled())
-                    getLog().debug("+  Dependencies not resolved or Reactor-Project has no dependencies!");
+                getLog().debug("+ Dependencies not resolved or reactor project has no dependencies!");
             } else {
                 for (final Artifact artifact : reactorProject.getArtifacts()) {
-                    if (getLog().isDebugEnabled())
-                        getLog().debug("  + " + artifact.getGroupId() + " : " + artifact.getArtifactId() + " : " +
-                                artifact.getVersion() + " : " + artifact.getType() + " : " + artifact.getFile());
+                    if (getLog().isDebugEnabled()) {
+                        getLog().debug("  + " + artifact.toString());
+                    }
                 }
             }
         }

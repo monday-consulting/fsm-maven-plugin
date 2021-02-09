@@ -21,6 +21,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 
 /**
@@ -51,6 +52,10 @@ class Xpp3DomIterator implements Iterator<Xpp3Dom>, Iterable<Xpp3Dom> {
      * {@inheritDoc}
      */
     public Xpp3Dom next() {
+        if(!hasNext()){
+            throw new NoSuchElementException();
+        }
+
         if (current == null) {
             if (!list.isEmpty()) {
                 current = list.pop();
@@ -71,6 +76,7 @@ class Xpp3DomIterator implements Iterator<Xpp3Dom>, Iterable<Xpp3Dom> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void remove() {
         if (current != null) {
             final Xpp3Dom parent = current.getParent();
@@ -99,6 +105,6 @@ class Xpp3DomIterator implements Iterator<Xpp3Dom>, Iterable<Xpp3Dom> {
      * {@inheritDoc}
      */
     public Iterator<Xpp3Dom> iterator() {
-        return this;
+        return new Xpp3DomIterator(root);
     }
 }
