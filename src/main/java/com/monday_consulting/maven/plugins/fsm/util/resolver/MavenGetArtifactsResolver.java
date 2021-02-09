@@ -47,24 +47,24 @@ public class MavenGetArtifactsResolver implements IResolver {
     private final RepositorySystem repoSystem;
     private final RepositorySystemSession repoSession;
     private final ProjectBuilder projectBuilder;
-    private final MavenProject mavenProject;
+    private final MavenProject parentMavenProject;
 
     /**
-     * @param log             The logger.
-     * @param reactorProjects The projects within the reactor.
-     * @param repoSystem      The maven repository system.
-     * @param repoSession     The maven repository session.
-     * @param projectBuilder  The maven project builder.
-     * @param mavenProject    This maven project.
+     * @param log                The logger.
+     * @param reactorProjects    The projects within the reactor.
+     * @param repoSystem         The maven repository system.
+     * @param repoSession        The maven repository session.
+     * @param projectBuilder     The maven project builder.
+     * @param parentMavenProject This maven project.
      */
     public MavenGetArtifactsResolver(final Log log, final List<MavenProject> reactorProjects, final RepositorySystem repoSystem,
-                                     final RepositorySystemSession repoSession, final ProjectBuilder projectBuilder, final MavenProject mavenProject) {
+                                     final RepositorySystemSession repoSession, final ProjectBuilder projectBuilder, final MavenProject parentMavenProject) {
         this.repoSystem = repoSystem;
         this.repoSession = repoSession;
         this.log = log;
         this.reactorProjects = reactorProjects;
         this.projectBuilder = projectBuilder;
-        this.mavenProject = mavenProject;
+        this.parentMavenProject = parentMavenProject;
     }
 
     /**
@@ -72,104 +72,117 @@ public class MavenGetArtifactsResolver implements IResolver {
      */
     public Module resolve(final ModuleType moduleType, final List<String> scopes) throws MojoFailureException, MojoExecutionException {
         final Module module = new Module(log, moduleType, scopes);
-        MavenProject mavenProject = getMavenProjectViaReactor(module);
-
-        if (mavenProject == null) {
-            log.info("Trying to find module " + module.getGroupId() + ":" + module.getArtifactId() + " in repository");
-            mavenProject = getMavenProjectViaRepository(module, projectBuilder);
-        }
-
-        if (mavenProject != null) {
-            List<Artifact> artifacts = new ArrayList<>(mavenProject.getArtifacts());
-            module.setProject(mavenProject);
-            module.setResolvedModuleArtifacts(artifacts);
-        }
+        List<MavenProject> mavenProjects = getMavenProjects(module);
+        module.setProjects(mavenProjects);
         return module;
     }
 
-    private MavenProject getMavenProjectViaReactor(final Module module) {
-        MavenProject mProject = null;
+    private List<MavenProject> getMavenProjects(final Module module) throws MojoFailureException {
+        List<MavenProject> mavenProjects = new ArrayList<>();
+
+        for (final DefaultArtifact artifactInfo : module.getArtifacts()) {
+            MavenProject mavenProject = getMavenProjectViaReactor(artifactInfo);
+            
+            if (mavenProject != null) {
+                mavenProjects.add(mavenProject);
+            } else {
+                log.info("Trying to find module in repository.");
+                mavenProjects.add(getMavenProjectViaRepository(artifactInfo));
+            }
+        }
+
+        return mavenProjects;
+    }
+
+    private MavenProject getMavenProjectViaReactor(final DefaultArtifact artifact) {
+        MavenProject mavenProject = null;
         boolean moduleInReactor = false;
 
+        final String logMessagePrefix = "Module " + artifact.getGroupId() + ":" + artifact.getArtifactId();
+        
         for (final MavenProject prj : reactorProjects) {
-            if ((prj.getArtifactId().equals(module.getArtifactId())) && (prj.getGroupId().equals(module.getGroupId()))) {
+            if ((prj.getArtifactId().equals(artifact.getArtifactId())) && (prj.getGroupId().equals(artifact.getGroupId()))) {
                 if (moduleInReactor) {
-                    log.error("module " + module.getGroupId() + ":" + module.getArtifactId() + " found twice in reactor!");
+                    log.error(logMessagePrefix + " found twice in reactor!");
                 } else {
-                    log.info("module " + module.getGroupId() + ":" + module.getArtifactId() + " found in reactor!");
+                    log.info(logMessagePrefix + " found in reactor!");
                     moduleInReactor = true;
-                    mProject = prj;
+                    mavenProject = prj;
                 }
             }
         }
         if (!moduleInReactor) {
-            log.warn("module " + module.getGroupId() + ":" + module.getArtifactId() + " not found in reactor!");
+            log.warn(logMessagePrefix + " not found in reactor!");
         }
 
-        return mProject;
+        return mavenProject;
     }
 
-    private MavenProject getMavenProjectViaRepository(final Module module, final ProjectBuilder projectBuilder) throws MojoFailureException {
+    private MavenProject getMavenProjectViaRepository(final DefaultArtifact artifact) throws MojoFailureException {
         try {
             final ProjectBuildingRequest request = new DefaultProjectBuildingRequest();
             request.setResolveDependencies(true);
-            request.setRemoteRepositories(mavenProject.getRemoteArtifactRepositories());
+            request.setRemoteRepositories(parentMavenProject.getRemoteArtifactRepositories());
             request.setRepositorySession(repoSession);
 
             final LocalRepositoryManager localRepositoryManager = repoSession.getLocalRepositoryManager();
             final File repoBasedir = localRepositoryManager.getRepository().getBasedir();
 
             // the module type artifact (war, jar, pom ...)
-            final DefaultArtifact moduleArtifact = new DefaultArtifact(module.getGroupId(), module.getArtifactId(), module.getClassifier(), module.getType(), module.getVersion());
-            final String pathForLocalArtifact = localRepositoryManager.getPathForLocalArtifact(moduleArtifact);
+
+            final String pathForLocalArtifact = localRepositoryManager.getPathForLocalArtifact(artifact);
             final File moduleArtifactFile = new File(repoBasedir, pathForLocalArtifact);
 
             // the module pom artifact to build maven project
-            final DefaultArtifact pomArtifact = new DefaultArtifact(module.getGroupId(), module.getArtifactId(), module.getClassifier(), "pom", module.getVersion());
+            final DefaultArtifact pomArtifact = new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(),
+                    artifact.getClassifier(), "pom", artifact.getVersion());
+
             final String localArtifactPath = localRepositoryManager.getPathForLocalArtifact(pomArtifact);
 
             final File projectFile = new File(repoBasedir, localArtifactPath);
 
             MavenProject result;
             try {
-                log.info("try to build maven project for " + module.getArtifactId() + " from local repository...");
+                log.info("Try to build maven project for " + artifact.getArtifactId() + " from local repository...");
                 result = projectBuilder.build(projectFile, request).getProject();
 
                 if (!moduleArtifactFile.exists()) {
-                    resolveArtifact(module, moduleArtifact);
+                    resolveArtifact(artifact);
                 }
             } catch (ProjectBuildingException e) {
-                log.info("failed... try to resolve " + module.getArtifactId() + " from remote repository...");
-                final Artifact mavenArtifact = new org.apache.maven.artifact.DefaultArtifact(module.getGroupId(), module.getArtifactId(), module.getVersion(),
-                        null, module.getType(), module.getClassifier(), new DefaultArtifactHandler());
+                log.info("failed... try to resolve " + artifact.getArtifactId() + " from remote repository...");
+                final Artifact mavenArtifact = new org.apache.maven.artifact.DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(),
+                        artifact.getVersion(), null, artifact.getExtension(), artifact.getClassifier(), new DefaultArtifactHandler());
                 result = projectBuilder.build(mavenArtifact, request).getProject();
 
-                resolveArtifact(module, moduleArtifact);
+                resolveArtifact(artifact);
             }
 
             if (result != null) {
-                log.info("Dependency resolved: " + module.getArtifactId());
+                log.info("Dependency resolved: " + artifact.getArtifactId());
                 result.getArtifact().setFile(moduleArtifactFile);
-                result.setParent(mavenProject);
+                result.setParent(parentMavenProject);
             } else {
-                throw new MojoFailureException("No dependency for " + module.getArtifactId() + " found in local or remote repository");
+                throw new MojoFailureException("No dependency for " + artifact.getArtifactId() + " found in local or remote repository.");
             }
 
             return result;
         } catch (ProjectBuildingException e) {
-            throw new MojoFailureException("No dependency for " + module.getArtifactId() + "found in local or remote repository", e);
+            throw new MojoFailureException("No dependency for " + artifact.getArtifactId() + "found in local or remote repository.", e);
         }
     }
 
-    private void resolveArtifact(final Module module, final DefaultArtifact moduleArtifact) throws MojoFailureException {
-        log.info("try to resolve artifact for " + module.getArtifactId() + " from remote repository...");
+    private void resolveArtifact(final DefaultArtifact moduleArtifact) throws MojoFailureException {
+        log.info("Try to resolve artifact for " + moduleArtifact.getArtifactId() + " from remote repository...");
         final ArtifactRequest artifactRequest = new ArtifactRequest();
         artifactRequest.setArtifact(moduleArtifact);
-        artifactRequest.setRepositories(mavenProject.getRemoteProjectRepositories());
+        artifactRequest.setRepositories(parentMavenProject.getRemoteProjectRepositories());
+        
         try {
             repoSystem.resolveArtifact(repoSession, artifactRequest);
         } catch (ArtifactResolutionException e1) {
-            throw new MojoFailureException("could not resolve artifact " + module.getArtifactId() + ":" + module.getType() + " for maven project", e1);
+            throw new MojoFailureException("Could not resolve artifact " + moduleArtifact.getArtifactId() + ":" +
+                    moduleArtifact.getExtension() + " for maven project.", e1);
         }
     }
 }
