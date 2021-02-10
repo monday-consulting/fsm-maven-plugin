@@ -113,7 +113,7 @@ public class Module {
     }
 
     /**
-     * Setter for the resolved module artifacts. Besides this method is filling the module dependency dom.
+     * Creates an XML dom for the resolved module artifacts.
      *
      * @throws MojoFailureException in case of plugin configuration problems.
      */
