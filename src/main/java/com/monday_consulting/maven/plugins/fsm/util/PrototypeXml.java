@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -44,13 +45,15 @@ public class PrototypeXml {
         this.dependencyJointList = new ArrayList<>();
         this.log = log;
         this.prototypeDom = Xpp3DomBuilder.build(new XmlStreamReader(prototypeXml));
-        if (log.isDebugEnabled())
+
+        if (log.isDebugEnabled()) {
             this.log.debug("Getting dependency-joints\nDependency-Joints to fill:");
+        }
 
         for (final Xpp3Dom xpp3Dom : new Xpp3DomIterator(prototypeDom)) {
             if (xpp3Dom.getName().equals("dependencies")) {
                 if (xpp3Dom.getValue().equals("")) {
-                    log.error("Prototype-Xml-Error:\nTried to retrieve dependency-joint, but because its value was empty, no connection to a module can be made");
+                    log.error("Prototype-Xml-Error:\nTried to retrieve dependency-joint, but because its value was empty, no connection to a module can be made.");
                 }
                 dependencyJointList.add(new DependencyJoint(xpp3Dom.getValue(), xpp3Dom));
                 if (log.isDebugEnabled())
@@ -65,22 +68,26 @@ public class PrototypeXml {
      * @param moduleList The list of components for the to build module.
      * @throws MojoExecutionException in case of configuration problems.
      */
-    public void fillPrototypeDom(final Map<String, Module> moduleList) throws MojoExecutionException {
+    public void fillPrototypeDom(final Map<String, Module> moduleList) throws MojoExecutionException, MojoFailureException {
         for (final DependencyJoint dJ : dependencyJointList) {
             Module moduleToInsert = moduleList.get(dJ.getDependencyTagValue());
+
             if (moduleToInsert == null) {
-                throw new MojoExecutionException("For the to be added Dependencies for the DependencyTagValue: " + dJ.getDependencyTagValue() + " no configuration could be found");
+                throw new MojoExecutionException("For the to be added Dependencies for the DependencyTagValue: " + dJ.getDependencyTagValue() + " no configuration could be found.");
             }
+
             final Xpp3Dom domToInsert = moduleToInsert.getModuleDependencyDom();
             final Xpp3Dom dom = dJ.getRoot();
             final Xpp3Dom parent = dom.getParent();
-            if (parent == null) {
-                // this is the root
-                prototypeDom = domToInsert;
-                log.warn("Insert-Into-Prototype-Dom-Error\nDependency-Joint-Dom: " + dom.getName() + " has no Elements?! Dependencies cant be added as root");
-            } else {
-                // this is a child
 
+            // root
+            if (parent == null) {
+                prototypeDom = domToInsert;
+                log.warn("Insert-Into-Prototype-Dom-Error\nDependency-Joint-Dom: " + dom.getName() + " has no Elements?! Dependencies can't be added as root.");
+            }
+
+            // child
+            else {
                 // remove temp-node with name "dependencies" and to be added dependencies
                 int pos = -1;
                 final Xpp3Dom[] arr = parent.getChildren();
@@ -94,7 +101,7 @@ public class PrototypeXml {
                     parent.removeChild(pos);
                 } else {
                     // dom not found. sb. changed it after init?
-                    log.warn("Insert-Into-Prototype-Dom-Error\nDependency-Joint-Dom: " + dom.getName() + " was not found in parent! It will be added as child under root");
+                    log.warn("Insert-Into-Prototype-Dom-Error\nDependency-Joint-Dom: " + dom.getName() + " was not found in parent! It will be added as child under root.");
                     // instead add new child to parent
                     parent.addChild(domToInsert);
                 }

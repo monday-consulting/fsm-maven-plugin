@@ -15,7 +15,7 @@ You could include it into your workspace with the following maven dependency:
     <dependency>
       <groupId>com.monday-consulting.maven.plugins</groupId>
       <artifactId>fsm-maven-plugin</artifactId>
-      <version>1.5.2</version>
+      <version>1.6.0</version>
     </dependency>
 ```
 
