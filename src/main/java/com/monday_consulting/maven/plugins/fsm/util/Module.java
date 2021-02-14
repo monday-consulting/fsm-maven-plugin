@@ -104,12 +104,12 @@ public class Module {
     }
 
     private Xpp3Dom getWebResourceTmpDom(final String name, final String dirPath) {
-        final Xpp3Dom tmpDom = new Xpp3Dom(RESOURCE_TAG);
+        final Xpp3Dom dom = new Xpp3Dom(RESOURCE_TAG);
         // fix windows paths to work with FirstSpirit module loader
-        tmpDom.setAttribute("target", "/" + dirPath.replace("\\", "/"));
+        dom.setAttribute("target", "/" + dirPath.replace("\\", "/"));
         final String value = getResource().getPrefix() != null ? getResource().getPrefix() + name : name;
-        tmpDom.setValue(value.replace("\\", "/"));
-        return tmpDom;
+        dom.setValue(value.replace("\\", "/"));
+        return dom;
     }
 
     /**
@@ -141,7 +141,40 @@ public class Module {
 
         addIncludesToDom(dom, history);
 
-        return dom;
+        return sortChilds(dom);
+    }
+
+    private Xpp3Dom sortChilds(Xpp3Dom src) {
+        Xpp3Dom copy = new Xpp3Dom(src.getName());
+        copy.setValue(src.getValue());
+
+        String[] attributeNames = src.getAttributeNames();
+
+        for (String attributeName : attributeNames) {
+            copy.setAttribute(attributeName, src.getAttribute(attributeName));
+        }
+
+        Xpp3Dom[] childs = src.getChildren();
+
+        Arrays.sort(childs, (d1, d2) -> {
+            final String n1 = d1.getAttribute("name");
+            final String n2 = d2.getAttribute("name");
+
+            if (n1 != null && n2 != null) {
+                return n1.compareTo(n2);
+            }
+
+            if (d1.getValue() != null && d2.getValue() != null) {
+                return d1.getValue().compareTo(d2.getValue());
+            }
+
+            return 0;
+        });
+
+        for (Xpp3Dom child : childs) {
+            copy.addChild(new Xpp3Dom(child));
+        }
+        return copy;
     }
 
     private void addArtifactsToDom(Xpp3Dom dom, List<Artifact> filteredModuleArtifacts, HashSet<String> history)  {
@@ -214,7 +247,7 @@ public class Module {
                 Xpp3Dom child = getWebResourceTmpDom(incl, dir);
 
                 if (!history.contains(child.getValue())) {
-                    dom.addChild(getWebResourceTmpDom(incl, dir));
+                    dom.addChild(child);
                     history.add(child.getValue());
                 }
             }
@@ -283,11 +316,18 @@ public class Module {
         final List<Artifact> filteredModuleArtifacts = new ArrayList<>();
 
         for (final Artifact artifact : resolvedModuleArtifacts) {
+
+            String logMsgPostfix = artifact.getArtifactId();
+
+            if (artifact.getScope() != null) {
+                logMsgPostfix += " with scope: " + artifact.getScope();
+            }
+
             if (!excludesMap.containsKey(artifact.getArtifactId()) && (artifact.getScope() == null || dependencyScopes.contains(artifact.getScope()))) {
-                log.info(" +included: " + artifact.getArtifactId() + " with scope: " + artifact.getScope());
+                log.info(" +included: " + logMsgPostfix);
                 filteredModuleArtifacts.add(artifact);
             } else {
-                log.info(" -filtered: " + artifact.getArtifactId() + " with scope: " + artifact.getScope());
+                log.info(" -filtered: " + logMsgPostfix);
             }
         }
 
