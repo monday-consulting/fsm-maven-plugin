@@ -140,23 +140,19 @@ public class Module {
         }
 
         addIncludesToDom(dom, history);
-
-        return sortChilds(dom);
+        sortChildren(dom);
+        return dom;
     }
 
-    private Xpp3Dom sortChilds(Xpp3Dom src) {
-        Xpp3Dom copy = new Xpp3Dom(src.getName());
-        copy.setValue(src.getValue());
+    private void sortChildren(Xpp3Dom src) {
+        ArrayList<Xpp3Dom> children = new ArrayList<>();
+        Collections.addAll(children, src.getChildren());
 
-        String[] attributeNames = src.getAttributeNames();
-
-        for (String attributeName : attributeNames) {
-            copy.setAttribute(attributeName, src.getAttribute(attributeName));
+        for (int n=src.getChildCount(); n>0; n=src.getChildCount()) {
+            src.removeChild(n-1);
         }
 
-        Xpp3Dom[] childs = src.getChildren();
-
-        Arrays.sort(childs, (d1, d2) -> {
+        children.sort((d1, d2) -> {
             final String n1 = d1.getAttribute("name");
             final String n2 = d2.getAttribute("name");
 
@@ -171,10 +167,9 @@ public class Module {
             return 0;
         });
 
-        for (Xpp3Dom child : childs) {
-            copy.addChild(new Xpp3Dom(child));
+        for (Xpp3Dom child : children) {
+            src.addChild(child);
         }
-        return copy;
     }
 
     private void addArtifactsToDom(Xpp3Dom dom, List<Artifact> filteredModuleArtifacts, HashSet<String> history)  {
