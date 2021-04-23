@@ -1,4 +1,4 @@
-# Monday FirstSpirit Module Maven Plugin [![Build Status](https://travis-ci.org/monday-consulting/fsm-maven-plugin.svg?branch=master)](https://travis-ci.org/monday-consulting/fsm-maven-plugin)
+# Monday FirstSpirit Module Maven Plugin
 
 You can use this Maven plugin to generate XML descriptors for FirstSpirit modules.
 
@@ -15,7 +15,7 @@ You could include it into your workspace with the following maven dependency:
     <dependency>
       <groupId>com.monday-consulting.maven.plugins</groupId>
       <artifactId>fsm-maven-plugin</artifactId>
-      <version>1.6.0</version>
+      <version>1.7.1</version>
     </dependency>
 ```
 
