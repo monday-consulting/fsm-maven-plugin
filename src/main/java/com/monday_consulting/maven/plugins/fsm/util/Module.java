@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import com.monday_consulting.maven.plugins.fsm.jaxb.*;
-import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -29,12 +29,12 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.artifact.DefaultArtifact;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
- * The POJO for a module component.
- * This object should represent a configuration via the fsm-plugin.xml.
- * It should be used to configure the FirstSpirit module components.
+ * The POJO for a module component. This object should represent a configuration via the fsm-plugin.xml. It should be used to
+ * configure the FirstSpirit module components.
  *
  * @author Marcel Scheland
  * @author Kassim Hölting
@@ -65,7 +65,8 @@ public class Module {
      * @param scopes     The dependency scopes that will be included (like compile, runtime).
      * @throws MojoExecutionException in case of a general failures.
      */
-    public Module(final Log log, final ModuleType moduleType, final List<String> scopes) throws MojoExecutionException, MojoFailureException {
+    public Module(final Log log, final ModuleType moduleType, final List<String> scopes) throws MojoExecutionException,
+            MojoFailureException {
         this.log = log;
         this.moduleType = moduleType;
 
@@ -100,7 +101,7 @@ public class Module {
         }
 
         return new DefaultArtifact(coords[0], coords[1],
-                coords.length > 4 ? coords[4] : null,  coords[2], coords.length > 3 ? coords[3] : null);
+                                   coords.length > 4 ? coords[4] : null, coords[2], coords.length > 3 ? coords[3] : null);
     }
 
     private Xpp3Dom getWebResourceTmpDom(final String name, final String dirPath) {
@@ -128,7 +129,8 @@ public class Module {
 
             if (artifactType.equals("jar")) {
                 log.info("Adding the project artifact itself: " + mavenProject.getArtifact().getArtifactId() +
-                        ", with absolute file: " + mavenProject.getArtifact().getFile().getAbsoluteFile() + "; finalname: " + mavenProject.getBuild().getFinalName());
+                         ", with absolute file: " + mavenProject.getArtifact().getFile().getAbsoluteFile() + "; finalname: " +
+                         mavenProject.getBuild().getFinalName());
                 resolvedModuleArtifacts.add(mavenProject.getArtifact());
             }
 
@@ -148,8 +150,8 @@ public class Module {
         ArrayList<Xpp3Dom> children = new ArrayList<>();
         Collections.addAll(children, src.getChildren());
 
-        for (int n=src.getChildCount(); n>0; n=src.getChildCount()) {
-            src.removeChild(n-1);
+        for (int n = src.getChildCount(); n > 0; n = src.getChildCount()) {
+            src.removeChild(n - 1);
         }
 
         children.sort((d1, d2) -> {
@@ -172,7 +174,7 @@ public class Module {
         }
     }
 
-    private void addArtifactsToDom(Xpp3Dom dom, List<Artifact> filteredModuleArtifacts, HashSet<String> history)  {
+    private void addArtifactsToDom(Xpp3Dom dom, List<Artifact> filteredModuleArtifacts, HashSet<String> history) {
         for (final Artifact artifact : filteredModuleArtifacts) {
             String value = getPrefix() + artifact.getFile().getName();
 
@@ -196,7 +198,8 @@ public class Module {
         }
     }
 
-    private void addArchiveFileIncludesToDom(final Xpp3Dom dom, final MavenProject mavenProject, HashSet<String> history) throws MojoFailureException {
+    private void addArchiveFileIncludesToDom(final Xpp3Dom dom, final MavenProject mavenProject, HashSet<String> history)
+            throws MojoFailureException {
         try {
             if (mavenProject == null) {
                 throw new MojoFailureException("For this module no maven project was set.");
@@ -214,7 +217,8 @@ public class Module {
                 log.warn("No <prefix> defined. Prefix would be set to root.");
             }
             if (res.getWebXml() == null || res.getWebXml().isEmpty()) {
-                throw new MojoFailureException("Module " + mavenProject.getArtifactId() + " from archive type " + mavenProject.getArtifact().getType() + " detected. No <web-xml> defined.");
+                throw new MojoFailureException("Module " + mavenProject.getArtifactId() + " from archive type " +
+                                               mavenProject.getArtifact().getType() + " detected. No <web-xml> defined.");
             }
 
             final List<String> includes = res.getIncludes().getInclude();
@@ -246,8 +250,7 @@ public class Module {
                     history.add(child.getValue());
                 }
             }
-
-        } catch (ZipException e) {
+        } catch (IOException e) {
             throw new MojoFailureException("Could not extract artifact file.", e);
         }
     }
@@ -281,11 +284,13 @@ public class Module {
         if (moduleType.getExcludes() != null) {
             for (ExcludeType excludeType : moduleType.getExcludes().getExclude()) {
                 if (Boolean.parseBoolean(excludeType.getOverrideIncludes()) && includes.containsKey(excludeType.getArtifactId())) {
-                    log.info("Possible configuration problem: Excluding the configured Inclusion of Artifact: " + excludeType.getArtifactId());
+                    log.info("Possible configuration problem: Excluding the configured Inclusion of Artifact: " +
+                             excludeType.getArtifactId());
                     includes.remove(excludeType.getArtifactId());
                 }
                 if (excludes.containsKey(excludeType.getArtifactId())) {
-                    throw new MojoFailureException("Exclusion of ArtifactId: " + excludeType.getArtifactId() + " is defined twice!");
+                    throw new MojoFailureException("Exclusion of ArtifactId: " + excludeType.getArtifactId() +
+                                                   " is defined twice!");
                 }
                 excludes.put(excludeType.getArtifactId(), excludeType);
             }
@@ -299,7 +304,8 @@ public class Module {
         if (moduleType.getIncludes() != null) {
             for (IncludeType includeType : moduleType.getIncludes().getInclude()) {
                 if (includes.containsKey(includeType.getArtifactId())) {
-                    throw new MojoFailureException("Inclusion of ArtifactId: " + includeType.getArtifactId() + " is defined twice!");
+                    throw new MojoFailureException("Inclusion of ArtifactId: " + includeType.getArtifactId() +
+                                                   " is defined twice!");
                 }
                 includes.put(includeType.getArtifactId(), includeType);
             }
@@ -318,7 +324,8 @@ public class Module {
                 logMsgPostfix += " with scope: " + artifact.getScope();
             }
 
-            if (!excludesMap.containsKey(artifact.getArtifactId()) && (artifact.getScope() == null || dependencyScopes.contains(artifact.getScope()))) {
+            if (!excludesMap.containsKey(artifact.getArtifactId()) &&
+                (artifact.getScope() == null || dependencyScopes.contains(artifact.getScope()))) {
                 log.info(" +included: " + logMsgPostfix);
                 filteredModuleArtifacts.add(artifact);
             } else {
@@ -329,23 +336,24 @@ public class Module {
         return Collections.unmodifiableList(filteredModuleArtifacts);
     }
 
-    private File extractArtifactToTargetDir(MavenProject mavenProject) throws ZipException {
+    private File extractArtifactToTargetDir(MavenProject mavenProject) throws IOException {
         final String targetFileDir = "/target/" + mavenProject.getName() + "-" + mavenProject.getVersion();
         File baseDir = new File(mavenProject.getBasedir() + targetFileDir);
 
         if (!baseDir.exists()) {
             final File artifactFile = mavenProject.getArtifact().getFile();
-            final ZipFile fileToExtract = new ZipFile(artifactFile);
+            try (final ZipFile fileToExtract = new ZipFile(artifactFile)) {
 
-            if (!fileToExtract.isValidZipFile()) {
-                throw new ZipException("No valid ZIP file: " + mavenProject.getArtifact().getFile());
-            }
-            if (fileToExtract.isEncrypted()) {
-                throw new ZipException("The ZIP file is password encrypted: " + mavenProject.getArtifact().getFile());
-            }
+                if (!fileToExtract.isValidZipFile()) {
+                    throw new ZipException("No valid ZIP file: " + mavenProject.getArtifact().getFile());
+                }
+                if (fileToExtract.isEncrypted()) {
+                    throw new ZipException("The ZIP file is password encrypted: " + mavenProject.getArtifact().getFile());
+                }
 
-            baseDir = new File(mavenProject.getParent().getBasedir().getAbsolutePath() + targetFileDir);
-            fileToExtract.extractAll(baseDir.getAbsolutePath());
+                baseDir = new File(mavenProject.getParent().getBasedir().getAbsolutePath() + targetFileDir);
+                fileToExtract.extractAll(baseDir.getAbsolutePath());
+            }
         }
 
         return baseDir;
