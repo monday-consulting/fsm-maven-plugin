@@ -120,10 +120,11 @@ public class MavenGetArtifactsResolver implements IResolver {
 
     private MavenProject getMavenProjectViaRepository(final DefaultArtifact artifact) throws MojoFailureException {
         try {
-            final ProjectBuildingRequest request = new DefaultProjectBuildingRequest();
-            request.setResolveDependencies(true);
-            request.setRemoteRepositories(parentMavenProject.getRemoteArtifactRepositories());
-            request.setRepositorySession(repoSession);
+            final ProjectBuildingRequest request = new DefaultProjectBuildingRequest()
+                    .setResolveDependencies(true)
+                    .setRemoteRepositories(parentMavenProject.getRemoteArtifactRepositories())
+                    .setRepositorySession(repoSession)
+                    .setSystemProperties(System.getProperties());
 
             final LocalRepositoryManager localRepositoryManager = repoSession.getLocalRepositoryManager();
             final File repoBasedir = localRepositoryManager.getRepository().getBasedir();
