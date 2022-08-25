@@ -10,7 +10,7 @@
 
     <xs:complexType name="fsm-maven-pluginType">
         <xs:sequence>
-            <xs:element type="scopesType" name="scopes"/>
+            <xs:element type="scopesType" name="scopes" minOccurs="0"/>
             <xs:element type="modulesType" name="modules"/>
         </xs:sequence>
     </xs:complexType>
@@ -40,12 +40,12 @@
 
     <xs:complexType name="moduleType">
         <xs:all>
-            <xs:element type="xs:string" name="id" minOccurs="0" maxOccurs="1"/>
-            <xs:element type="idsType" name="ids" minOccurs="0" maxOccurs="1"/>
-            <xs:element type="xs:string" name="prefix"/>
+            <xs:element type="xs:string" name="id" minOccurs="0"/>
+            <xs:element type="idsType" name="ids" minOccurs="0"/>
+            <xs:element type="xs:string" name="prefix" minOccurs="0"/>
             <xs:element type="resource" name="resource" minOccurs="0"/>
             <xs:element type="xs:string" name="dependencyTagValueInXml"/>
-            <xs:element type="xs:string" name="firstSpiritScope"/>
+            <xs:element type="xs:string" name="firstSpiritScope" minOccurs="0"/>
             <xs:element type="xs:string" name="firstSpiritMode" minOccurs="0"/>
             <xs:element type="includesType" name="includes" minOccurs="0"/>
             <xs:element type="excludesType" name="excludes" minOccurs="0"/>

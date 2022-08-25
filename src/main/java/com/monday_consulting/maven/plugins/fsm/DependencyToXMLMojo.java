@@ -18,6 +18,7 @@ limitations under the License.
 
 import com.monday_consulting.maven.plugins.fsm.jaxb.FsmMavenPluginType;
 import com.monday_consulting.maven.plugins.fsm.jaxb.ModuleType;
+import com.monday_consulting.maven.plugins.fsm.jaxb.ScopesType;
 import com.monday_consulting.maven.plugins.fsm.util.Module;
 import com.monday_consulting.maven.plugins.fsm.util.PrototypeXml;
 import com.monday_consulting.maven.plugins.fsm.util.XmlValidationEventHandler;
@@ -221,11 +222,29 @@ class DependencyToXMLMojo extends AbstractMojo {
             unmarshaller.setEventHandler(new XmlValidationEventHandler(getLog()));
 
             final JAXBElement<FsmMavenPluginType> jaxbElement = unmarshaller.unmarshal(streamSource, FsmMavenPluginType.class);
-            return jaxbElement.getValue();
+            FsmMavenPluginType config = jaxbElement.getValue();
+            applyDefaultConfiguration(config);
+            return config;
         } catch (SAXException e) {
             throw new MojoExecutionException(e, "Error while parsing file with SAX", e.getMessage());
         } catch (JAXBException e) {
             throw new MojoExecutionException(e, "Error while binding xml-file with JAXB", e.getMessage());
+        }
+    }
+
+    void applyDefaultConfiguration(FsmMavenPluginType config) {
+        if (config.getScopes() == null) {
+            ScopesType defaultScopesType = new ScopesType();
+            List<String> defaultScopes = defaultScopesType.getScope();
+            defaultScopes.add("runtime");
+            defaultScopes.add("compile");
+            config.setScopes(defaultScopesType);
+        }
+
+        for (ModuleType moduleType : config.getModules().getModule()) {
+            if (moduleType.getPrefix() == null) {
+                moduleType.setPrefix("");
+            }
         }
     }
 
