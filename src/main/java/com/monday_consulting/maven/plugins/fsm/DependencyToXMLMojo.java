@@ -51,6 +51,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -252,8 +253,10 @@ class DependencyToXMLMojo extends AbstractMojo {
      * @throws IOException in case of unexpected writer exceptions.
      */
     private void writeDomToTarget(final File target, final Xpp3Dom dom) throws IOException {
-        if (getLog().isDebugEnabled())
-            getLog().debug("writing: " + dom.getName() + " to: " + target.getAbsoluteFile());
+        getLog().info("Writing module descriptor: " + target.getAbsolutePath());
+
+        // ensure that the target directory exists
+        Files.createDirectories(target.toPath().getParent());
 
         final XmlStreamWriter writer = WriterFactory.newXmlWriter(target);
         final PrettyPrintXMLWriter pretty = new PrettyPrintXMLWriter(writer);
