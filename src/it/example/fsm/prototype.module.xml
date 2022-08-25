@@ -1,0 +1,16 @@
+<module>
+
+    <name>Monday Math</name>
+    <version>${project.version}</version>
+
+    <components>
+        <web-app>
+            <name>Math</name>
+            <version>${project.version}</version>
+            <web-resources>
+                <!-- Tag from plugin.xml -->
+                <dependencies>math</dependencies>
+            </web-resources>
+        </web-app>
+    </components>
+</module>

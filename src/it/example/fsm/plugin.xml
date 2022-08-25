@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fsm-maven-plugin>
+    <modules>
+        <module>
+            <id>org.apache.commons:commons-math3:jar:${commons.math.version}</id>
+            <!-- This matches the tag in prototype.module.xml -->
+            <dependencyTagValueInXml>math</dependencyTagValueInXml>
+        </module>
+    </modules>
+</fsm-maven-plugin>

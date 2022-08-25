@@ -296,5 +296,36 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>integrationTest</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-invoker-plugin</artifactId>
+                        <version>3.3.0</version>
+                        <configuration>
+                            <projectsDirectory>src/it</projectsDirectory>
+                            <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+                            <streamLogs>true</streamLogs>
+                            <postBuildHookScript>verify</postBuildHookScript>
+                            <!-- Debug Plugin Run -->
+                            <!--
+                            <mavenExecutable>${maven.home}/bin/mvnDebug</mavenExecutable>
+                            -->
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>install</goal>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>
