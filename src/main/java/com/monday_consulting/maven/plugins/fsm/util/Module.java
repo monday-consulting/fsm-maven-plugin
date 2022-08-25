@@ -119,6 +119,7 @@ public class Module {
      * @throws MojoFailureException in case of plugin configuration problems.
      */
     public Xpp3Dom getModuleDependencyDom() throws MojoFailureException {
+        log.info("Processing dependency tag '" + dependencyTagValueInXml + "'");
         final Xpp3Dom dom = new Xpp3Dom(ROOT_TAG);
         final HashSet<String> history = new HashSet<>();
 
@@ -128,7 +129,7 @@ public class Module {
             final String artifactType = mavenProject.getArtifact().getType();
 
             if (artifactType.equals("jar")) {
-                log.info("Adding the project artifact itself: " + mavenProject.getArtifact().getArtifactId() +
+                log.debug("Adding the project artifact itself: " + mavenProject.getArtifact().getArtifactId() +
                          ", with absolute file: " + mavenProject.getArtifact().getFile().getAbsoluteFile() + "; finalname: " +
                          mavenProject.getBuild().getFinalName());
                 resolvedModuleArtifacts.add(mavenProject.getArtifact());
@@ -326,10 +327,10 @@ public class Module {
 
             if (!excludesMap.containsKey(artifact.getArtifactId()) &&
                 (artifact.getScope() == null || dependencyScopes.contains(artifact.getScope()))) {
-                log.info(" +included: " + logMsgPostfix);
+                log.debug(" +included: " + logMsgPostfix);
                 filteredModuleArtifacts.add(artifact);
             } else {
-                log.info(" -filtered: " + logMsgPostfix);
+                log.debug(" -filtered: " + logMsgPostfix);
             }
         }
 

@@ -129,16 +129,14 @@ class DependencyToXMLMojo extends AbstractMojo {
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            getLog().info("***Starting DependencyToXMLMojo");
+            getLog().debug("*** Starting DependencyToXMLMojo");
             checkReactor(reactorProjects);
 
-            if (getLog().isDebugEnabled())
-                getLog().debug("Create config-xml-Object");
+            getLog().debug("Create config-xml-Object");
 
             final FsmMavenPluginType config = bindXmlConfigToPojo(configXml);
 
-            if (getLog().isDebugEnabled())
-                getLog().debug("Creating PrototypeXml-Object");
+            getLog().debug("Creating PrototypeXml-Object");
 
             PrototypeXml prototype = new PrototypeXml(getLog(), prototypeXml);
 
@@ -146,6 +144,7 @@ class DependencyToXMLMojo extends AbstractMojo {
                 getLog().debug("Getting target-file: " + targetXml.getAbsoluteFile());
                 getLog().debug("Enhance created Modules");
             }
+
             final IResolver resolver = new MavenGetArtifactsResolver(getLog(), reactorProjects, repoSystem, repoSession, projectBuilder, mavenProject);
             final Map<String, Module> modules = new HashMap<>();
             for (final ModuleType moduleType : config.getModules().getModule()) {
@@ -156,20 +155,17 @@ class DependencyToXMLMojo extends AbstractMojo {
                 modules.put(moduleType.getDependencyTagValueInXml(), resolver.resolve(moduleType, config.getScopes().getScope()));
             }
 
-            if (getLog().isDebugEnabled())
-                getLog().debug("Enhance Prototype for TargetXml");
+            getLog().debug("Enhance Prototype for TargetXml");
 
             prototype.fillPrototypeDom(modules);
 
-            if (getLog().isDebugEnabled())
-                getLog().debug("Write TargetXml-File");
+            getLog().debug("Write TargetXml-File");
 
             writeDomToTarget(targetXml, prototype.getPrototypeDom());
 
-            if (getLog().isDebugEnabled())
-                getLog().debug("Dependencies written to Module-XML:\n\t" + prototype.getPrototypeDom().toString());
+            getLog().debug("Dependencies written to Module-XML:\n\t" + prototype.getPrototypeDom().toString());
 
-            getLog().info("***DependencyToXMLMojo finished");
+            getLog().debug("*** DependencyToXMLMojo finished");
         } catch (XmlPullParserException | IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
@@ -210,7 +206,7 @@ class DependencyToXMLMojo extends AbstractMojo {
      * @throws MojoExecutionException in case of marshalling exception for the fsm-plugin.xsd.
      */
     private FsmMavenPluginType bindXmlConfigToPojo(final File configXml) throws MojoExecutionException {
-        getLog().debug("***Constructing ConfigXml-Object");
+        getLog().debug("*** Constructing ConfigXml-Object");
 
         try {
             final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -263,7 +259,5 @@ class DependencyToXMLMojo extends AbstractMojo {
         final PrettyPrintXMLWriter pretty = new PrettyPrintXMLWriter(writer);
         Xpp3DomWriter.write(pretty, dom);
         writer.close();
-        if (getLog().isDebugEnabled())
-            getLog().debug(dom.getName() + " written to: " + target.getAbsoluteFile());
     }
 }

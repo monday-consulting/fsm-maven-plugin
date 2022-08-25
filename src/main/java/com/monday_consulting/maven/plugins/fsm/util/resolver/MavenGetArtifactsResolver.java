@@ -71,6 +71,7 @@ public class MavenGetArtifactsResolver implements IResolver {
      * {@inheritDoc}
      */
     public Module resolve(final ModuleType moduleType, final List<String> scopes) throws MojoFailureException, MojoExecutionException {
+        log.debug("Resolving module for dependency tag " + moduleType.getDependencyTagValueInXml());
         final Module module = new Module(log, moduleType, scopes);
         List<MavenProject> mavenProjects = getMavenProjects(module);
         module.setProjects(mavenProjects);
@@ -86,7 +87,8 @@ public class MavenGetArtifactsResolver implements IResolver {
             if (mavenProject != null) {
                 mavenProjects.add(mavenProject);
             } else {
-                log.info("Trying to find module in repository.");
+                log.debug("Module " + artifactInfo.getGroupId() + ":" + artifactInfo.getArtifactId()
+                        + " not found in reactor, trying to find it in the local repository.");
                 mavenProjects.add(getMavenProjectViaRepository(artifactInfo));
             }
         }
@@ -99,20 +101,17 @@ public class MavenGetArtifactsResolver implements IResolver {
         boolean moduleInReactor = false;
 
         final String logMessagePrefix = "Module " + artifact.getGroupId() + ":" + artifact.getArtifactId();
-        
+
         for (final MavenProject prj : reactorProjects) {
             if ((prj.getArtifactId().equals(artifact.getArtifactId())) && (prj.getGroupId().equals(artifact.getGroupId()))) {
                 if (moduleInReactor) {
                     log.error(logMessagePrefix + " found twice in reactor!");
                 } else {
-                    log.info(logMessagePrefix + " found in reactor!");
+                    log.debug(logMessagePrefix + " found in reactor!");
                     moduleInReactor = true;
                     mavenProject = prj;
                 }
             }
-        }
-        if (!moduleInReactor) {
-            log.warn(logMessagePrefix + " not found in reactor!");
         }
 
         return mavenProject;
@@ -144,14 +143,13 @@ public class MavenGetArtifactsResolver implements IResolver {
 
             MavenProject result;
             try {
-                log.info("Try to build maven project for " + artifact.getArtifactId() + " from local repository...");
                 result = projectBuilder.build(projectFile, request).getProject();
 
                 if (!moduleArtifactFile.exists()) {
                     resolveArtifact(artifact);
                 }
             } catch (ProjectBuildingException e) {
-                log.info("failed... try to resolve " + artifact.getArtifactId() + " from remote repository...");
+                log.debug("failed... try to resolve " + artifact.getArtifactId() + " from remote repository...");
                 final Artifact mavenArtifact = new org.apache.maven.artifact.DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(),
                         artifact.getVersion(), null, artifact.getExtension(), artifact.getClassifier(), new DefaultArtifactHandler());
                 result = projectBuilder.build(mavenArtifact, request).getProject();
@@ -160,7 +158,7 @@ public class MavenGetArtifactsResolver implements IResolver {
             }
 
             if (result != null) {
-                log.info("Dependency resolved: " + artifact.getArtifactId());
+                log.debug("Dependency resolved: " + artifact.getArtifactId() + ":" + artifact.getVersion());
                 result.getArtifact().setFile(moduleArtifactFile);
                 result.setParent(parentMavenProject);
             } else {
