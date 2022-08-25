@@ -87,14 +87,14 @@
 
         <junit.version>5.9.0</junit.version>
 
-        <maven.plugin.plugin>3.6.0</maven.plugin.plugin>
-        <maven.sonatype.nexus.plugin>1.6.8</maven.sonatype.nexus.plugin>
+        <maven.plugin.plugin>3.6.4</maven.plugin.plugin>
+        <maven.sonatype.nexus.plugin>1.6.13</maven.sonatype.nexus.plugin>
         <maven.jaxb2.plugin>1.5</maven.jaxb2.plugin>
-        <maven.resources.plugin>3.1.0</maven.resources.plugin>
+        <maven.resources.plugin>3.3.0</maven.resources.plugin>
         <maven.gpg.plugin>1.6</maven.gpg.plugin>
-        <maven.clean.plugin>3.1.0</maven.clean.plugin>
-        <maven.compiler.plugin>3.8.1</maven.compiler.plugin>
-        <maven.jar.plugin>3.2.0</maven.jar.plugin>
+        <maven.clean.plugin>3.2.0</maven.clean.plugin>
+        <maven.compiler.plugin>3.10.1</maven.compiler.plugin>
+        <maven.jar.plugin>3.2.2</maven.jar.plugin>
         <maven.surefire.plugin>2.22.2</maven.surefire.plugin>
     </properties>
 
@@ -156,6 +156,7 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>${maven.resources.plugin}</version>
                 <executions>
