@@ -1,0 +1,11 @@
+<module>
+
+    <name>Monday Dependency Conflict</name>
+    <version>${project.version}</version>
+
+    <resources>
+        <dependencies>module-resources</dependencies>
+        <dependencies>server-resources</dependencies>
+        <dependencies>manual-override</dependencies>
+    </resources>
+</module>

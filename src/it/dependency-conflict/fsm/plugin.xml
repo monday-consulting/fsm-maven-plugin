@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fsm-maven-plugin>
+    <!--
+        These modules have a dependency conflict for 'com.google.guava:guava'.
+        Conflicts are resolved by taking the version seen first. Therefore, in the first module,
+        version 27.1-jre is taken from owasp, while in the second version 19.0.20150826 is taken from mapdb.
+     -->
+    <modules>
+
+        <!-- Should resolve to 27.1-jre from wasp -->
+        <module>
+            <ids>
+                <!-- contains guava 27.1-jre -->
+                <id>com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:jar:20191001.1</id>
+                <!-- contains guava 19.0.20150826 -->
+                <id>org.mapdb:mapdb:jar:3.0.0</id>
+            </ids>
+            <prefix>lib/</prefix>
+            <dependencyTagValueInXml>module-resources</dependencyTagValueInXml>
+            <firstSpiritScope>module</firstSpiritScope>
+            <firstSpiritMode>isolated</firstSpiritMode>
+        </module>
+
+        <!-- Should resolve to 19.0.20150826 from mapdb -->
+        <module>
+            <ids>
+                <!-- contains guava 19.0.20150826 -->
+                <id>org.mapdb:mapdb:jar:3.0.0</id>
+                <!-- contains guava 27.1-jre -->
+                <id>com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:jar:20191001.1</id>
+            </ids>
+            <prefix>lib/</prefix>
+            <dependencyTagValueInXml>server-resources</dependencyTagValueInXml>
+            <firstSpiritScope>server</firstSpiritScope>
+            <firstSpiritMode>isolated</firstSpiritMode>
+        </module>
+
+        <!-- Override -->
+        <module>
+            <ids>
+                <id>com.google.guava:guava:jar:31.1-jre</id>
+                <!-- contains guava 19.0.20150826 -->
+                <id>org.mapdb:mapdb:jar:3.0.0</id>
+                <!-- contains guava 27.1-jre -->
+                <id>com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:jar:20191001.1</id>
+            </ids>
+            <prefix>lib/</prefix>
+            <dependencyTagValueInXml>manual-override</dependencyTagValueInXml>
+            <firstSpiritScope>server</firstSpiritScope>
+            <firstSpiritMode>legacy</firstSpiritMode>
+        </module>
+    </modules>
+</fsm-maven-plugin>

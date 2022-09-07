@@ -119,28 +119,39 @@ public class Module {
      * @throws MojoFailureException in case of plugin configuration problems.
      */
     public Xpp3Dom getModuleDependencyDom() throws MojoFailureException {
+        log.info("Processing dependency tag '" + dependencyTagValueInXml + "'");
         final Xpp3Dom dom = new Xpp3Dom(ROOT_TAG);
         final HashSet<String> history = new HashSet<>();
 
+        final Set<Artifact> resolvedModuleArtifacts = new LinkedHashSet<>();
+
         for (final MavenProject mavenProject : getProjects()) {
-            final List<Artifact> resolvedModuleArtifacts = new ArrayList<>(mavenProject.getArtifacts());
+            log.info("Resolving dependencies for module " + mavenProject.getGroupId()
+                    + ":" + mavenProject.getArtifactId());
 
-            final String artifactType = mavenProject.getArtifact().getType();
+            resolvedModuleArtifacts.addAll(mavenProject.getArtifacts());
 
-            if (artifactType.equals("jar")) {
-                log.info("Adding the project artifact itself: " + mavenProject.getArtifact().getArtifactId() +
-                         ", with absolute file: " + mavenProject.getArtifact().getFile().getAbsoluteFile() + "; finalname: " +
+            final Artifact projectArtifact = mavenProject.getArtifact();
+            final String artifactType = projectArtifact.getType();
+
+            if (artifactType.equals("jar") || artifactType.equals("bundle")) {
+                log.debug("Adding the project artifact itself: " + projectArtifact.getArtifactId() +
+                         ", with absolute file: " + projectArtifact.getFile().getAbsoluteFile() + "; finalname: " +
                          mavenProject.getBuild().getFinalName());
-                resolvedModuleArtifacts.add(mavenProject.getArtifact());
+                resolvedModuleArtifacts.add(projectArtifact);
             }
-
-            addArtifactsToDom(dom, getFilteredModuleArtifacts(resolvedModuleArtifacts), history);
 
             if (artifactType.equals("war") || artifactType.equals("zip")) {
                 addArchiveFileIncludesToDom(dom, mavenProject, history);
             }
         }
 
+        List<Artifact> filteredModuleArtifacts = getFilteredModuleArtifacts(resolvedModuleArtifacts);
+
+        ConflictResolver conflictResolver = new ConflictResolver(log, dependencyTagValueInXml);
+        List<Artifact> moduleArtifacts = conflictResolver.resolveVersionConflicts(filteredModuleArtifacts);
+
+        addArtifactsToDom(dom, moduleArtifacts, history);
         addIncludesToDom(dom, history);
         sortChildren(dom);
         return dom;
@@ -313,7 +324,7 @@ public class Module {
         return includes;
     }
 
-    private List<Artifact> getFilteredModuleArtifacts(List<Artifact> resolvedModuleArtifacts) {
+    private List<Artifact> getFilteredModuleArtifacts(Collection<Artifact> resolvedModuleArtifacts) {
         final List<Artifact> filteredModuleArtifacts = new ArrayList<>();
 
         for (final Artifact artifact : resolvedModuleArtifacts) {
@@ -326,10 +337,10 @@ public class Module {
 
             if (!excludesMap.containsKey(artifact.getArtifactId()) &&
                 (artifact.getScope() == null || dependencyScopes.contains(artifact.getScope()))) {
-                log.info(" +included: " + logMsgPostfix);
+                log.debug(" +included: " + logMsgPostfix);
                 filteredModuleArtifacts.add(artifact);
             } else {
-                log.info(" -filtered: " + logMsgPostfix);
+                log.debug(" -filtered: " + logMsgPostfix);
             }
         }
 

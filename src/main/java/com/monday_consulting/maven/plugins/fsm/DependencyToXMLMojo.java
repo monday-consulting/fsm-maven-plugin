@@ -18,6 +18,7 @@ limitations under the License.
 
 import com.monday_consulting.maven.plugins.fsm.jaxb.FsmMavenPluginType;
 import com.monday_consulting.maven.plugins.fsm.jaxb.ModuleType;
+import com.monday_consulting.maven.plugins.fsm.jaxb.ScopesType;
 import com.monday_consulting.maven.plugins.fsm.util.Module;
 import com.monday_consulting.maven.plugins.fsm.util.PrototypeXml;
 import com.monday_consulting.maven.plugins.fsm.util.XmlValidationEventHandler;
@@ -50,6 +51,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,16 +130,14 @@ class DependencyToXMLMojo extends AbstractMojo {
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            getLog().info("***Starting DependencyToXMLMojo");
+            getLog().debug("*** Starting DependencyToXMLMojo");
             checkReactor(reactorProjects);
 
-            if (getLog().isDebugEnabled())
-                getLog().debug("Create config-xml-Object");
+            getLog().debug("Create config-xml-Object");
 
             final FsmMavenPluginType config = bindXmlConfigToPojo(configXml);
 
-            if (getLog().isDebugEnabled())
-                getLog().debug("Creating PrototypeXml-Object");
+            getLog().debug("Creating PrototypeXml-Object");
 
             PrototypeXml prototype = new PrototypeXml(getLog(), prototypeXml);
 
@@ -145,6 +145,7 @@ class DependencyToXMLMojo extends AbstractMojo {
                 getLog().debug("Getting target-file: " + targetXml.getAbsoluteFile());
                 getLog().debug("Enhance created Modules");
             }
+
             final IResolver resolver = new MavenGetArtifactsResolver(getLog(), reactorProjects, repoSystem, repoSession, projectBuilder, mavenProject);
             final Map<String, Module> modules = new HashMap<>();
             for (final ModuleType moduleType : config.getModules().getModule()) {
@@ -155,20 +156,17 @@ class DependencyToXMLMojo extends AbstractMojo {
                 modules.put(moduleType.getDependencyTagValueInXml(), resolver.resolve(moduleType, config.getScopes().getScope()));
             }
 
-            if (getLog().isDebugEnabled())
-                getLog().debug("Enhance Prototype for TargetXml");
+            getLog().debug("Enhance Prototype for TargetXml");
 
             prototype.fillPrototypeDom(modules);
 
-            if (getLog().isDebugEnabled())
-                getLog().debug("Write TargetXml-File");
+            getLog().debug("Write TargetXml-File");
 
             writeDomToTarget(targetXml, prototype.getPrototypeDom());
 
-            if (getLog().isDebugEnabled())
-                getLog().debug("Dependencies written to Module-XML:\n\t" + prototype.getPrototypeDom().toString());
+            getLog().debug("Dependencies written to Module-XML:\n\t" + prototype.getPrototypeDom().toString());
 
-            getLog().info("***DependencyToXMLMojo finished");
+            getLog().debug("*** DependencyToXMLMojo finished");
         } catch (XmlPullParserException | IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
@@ -209,7 +207,7 @@ class DependencyToXMLMojo extends AbstractMojo {
      * @throws MojoExecutionException in case of marshalling exception for the fsm-plugin.xsd.
      */
     private FsmMavenPluginType bindXmlConfigToPojo(final File configXml) throws MojoExecutionException {
-        getLog().debug("***Constructing ConfigXml-Object");
+        getLog().debug("*** Constructing ConfigXml-Object");
 
         try {
             final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -221,11 +219,29 @@ class DependencyToXMLMojo extends AbstractMojo {
             unmarshaller.setEventHandler(new XmlValidationEventHandler(getLog()));
 
             final JAXBElement<FsmMavenPluginType> jaxbElement = unmarshaller.unmarshal(streamSource, FsmMavenPluginType.class);
-            return jaxbElement.getValue();
+            FsmMavenPluginType config = jaxbElement.getValue();
+            applyDefaultConfiguration(config);
+            return config;
         } catch (SAXException e) {
             throw new MojoExecutionException(e, "Error while parsing file with SAX", e.getMessage());
         } catch (JAXBException e) {
             throw new MojoExecutionException(e, "Error while binding xml-file with JAXB", e.getMessage());
+        }
+    }
+
+    void applyDefaultConfiguration(FsmMavenPluginType config) {
+        if (config.getScopes() == null) {
+            ScopesType defaultScopesType = new ScopesType();
+            List<String> defaultScopes = defaultScopesType.getScope();
+            defaultScopes.add("runtime");
+            defaultScopes.add("compile");
+            config.setScopes(defaultScopesType);
+        }
+
+        for (ModuleType moduleType : config.getModules().getModule()) {
+            if (moduleType.getPrefix() == null) {
+                moduleType.setPrefix("");
+            }
         }
     }
 
@@ -237,14 +253,14 @@ class DependencyToXMLMojo extends AbstractMojo {
      * @throws IOException in case of unexpected writer exceptions.
      */
     private void writeDomToTarget(final File target, final Xpp3Dom dom) throws IOException {
-        if (getLog().isDebugEnabled())
-            getLog().debug("writing: " + dom.getName() + " to: " + target.getAbsoluteFile());
+        getLog().info("Writing module descriptor: " + target.getAbsolutePath());
+
+        // ensure that the target directory exists
+        Files.createDirectories(target.toPath().getParent());
 
         final XmlStreamWriter writer = WriterFactory.newXmlWriter(target);
         final PrettyPrintXMLWriter pretty = new PrettyPrintXMLWriter(writer);
         Xpp3DomWriter.write(pretty, dom);
         writer.close();
-        if (getLog().isDebugEnabled())
-            getLog().debug(dom.getName() + " written to: " + target.getAbsoluteFile());
     }
 }
