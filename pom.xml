@@ -94,7 +94,7 @@
         <maven.gpg.plugin>1.6</maven.gpg.plugin>
         <maven.clean.plugin>3.2.0</maven.clean.plugin>
         <maven.compiler.plugin>3.10.1</maven.compiler.plugin>
-        <maven.jar.plugin>3.2.2</maven.jar.plugin>
+        <maven.jar.plugin>3.3.0</maven.jar.plugin>
         <maven.surefire.plugin>2.22.2</maven.surefire.plugin>
     </properties>
 
