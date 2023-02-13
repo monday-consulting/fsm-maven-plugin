@@ -151,6 +151,12 @@ public class Module {
         ConflictResolver conflictResolver = new ConflictResolver(log, dependencyTagValueInXml);
         List<Artifact> moduleArtifacts = conflictResolver.resolveVersionConflicts(filteredModuleArtifacts);
 
+        if (moduleArtifacts.isEmpty()) {
+            log.warn("No artifacts found for dependency tag '" + dependencyTagValueInXml + "'. This is" +
+                    " most likely an error in the build configuration. Please make sure that all reactor projects" +
+                    " have been processed before running the FSM plugin and have not been modified after packaging.");
+        }
+
         addArtifactsToDom(dom, moduleArtifacts, history);
         addIncludesToDom(dom, history);
         sortChildren(dom);
