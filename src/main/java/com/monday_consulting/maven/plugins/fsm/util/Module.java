@@ -207,7 +207,7 @@ public class Module {
                     tmpDom.setAttribute("mode", moduleType.getFirstSpiritMode().trim());
                 }
                 tmpDom.setAttribute("name", artifact.getGroupId() + ":" + artifact.getArtifactId());
-                tmpDom.setAttribute("version", artifact.getVersion());
+                tmpDom.setAttribute("version", artifact.getBaseVersion());
 
                 tmpDom.setValue(value);
                 dom.addChild(tmpDom);
