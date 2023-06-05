@@ -206,13 +206,31 @@ public class Module {
                 if (moduleType.getFirstSpiritMode() != null && !moduleType.getFirstSpiritMode().isEmpty()) {
                     tmpDom.setAttribute("mode", moduleType.getFirstSpiritMode().trim());
                 }
-                tmpDom.setAttribute("name", artifact.getGroupId() + ":" + artifact.getArtifactId());
+
+                tmpDom.setAttribute("name", formatArtifactName(artifact));
                 tmpDom.setAttribute("version", artifact.getBaseVersion());
 
                 tmpDom.setValue(value);
                 dom.addChild(tmpDom);
             }
         }
+    }
+
+    /**
+     * Constructs a formatted string representing the artifact details.<br>
+     * Format: groupId:artifactId[:classifier] (classifier included if present).
+     *
+     * @param artifact Artifact object to be formatted.
+     * @return Formatted artifact details as a string.
+     */
+    private static String formatArtifactName(Artifact artifact) {
+        String formattedName = artifact.getGroupId() + ":" + artifact.getArtifactId();
+
+        if (artifact.hasClassifier()) {
+            formattedName += ":" + artifact.getClassifier();
+        }
+
+        return formattedName;
     }
 
     private void addArchiveFileIncludesToDom(final Xpp3Dom dom, final MavenProject mavenProject, HashSet<String> history)
