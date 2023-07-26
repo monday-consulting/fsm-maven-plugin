@@ -167,7 +167,7 @@ public class MavenGetArtifactsResolver implements IResolver {
 
             return result;
         } catch (ProjectBuildingException e) {
-            throw new MojoFailureException("No dependency for " + artifact.getArtifactId() + "found in local or remote repository.", e);
+            throw new MojoFailureException("No dependency for " + artifact.getArtifactId() + " found in local or remote repository.", e);
         }
     }
 
