@@ -1,0 +1,16 @@
+<module>
+
+    <name>Monday XML Resovler</name>
+    <version>${project.version}</version>
+
+    <components>
+        <web-app>
+            <name>XML Resolver</name>
+            <version>${project.version}</version>
+            <web-resources>
+                <!-- Tag from plugin.xml -->
+                <dependencies>xmlresolver</dependencies>
+            </web-resources>
+        </web-app>
+    </components>
+</module>

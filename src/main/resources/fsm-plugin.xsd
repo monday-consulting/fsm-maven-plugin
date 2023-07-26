@@ -42,7 +42,7 @@
         <xs:all>
             <xs:element type="xs:string" name="id" minOccurs="0"/>
             <xs:element type="idsType" name="ids" minOccurs="0"/>
-            <xs:element type="xs:string" name="prefix" minOccurs="0"/>
+            <xs:element type="xs:string" name="prefix" minOccurs="0" />
             <xs:element type="resource" name="resource" minOccurs="0"/>
             <xs:element type="xs:string" name="dependencyTagValueInXml"/>
             <xs:element type="xs:string" name="firstSpiritScope" minOccurs="0"/>
