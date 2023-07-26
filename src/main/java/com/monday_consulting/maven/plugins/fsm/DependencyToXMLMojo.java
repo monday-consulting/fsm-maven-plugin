@@ -25,20 +25,20 @@ import com.monday_consulting.maven.plugins.fsm.util.XmlValidationEventHandler;
 import com.monday_consulting.maven.plugins.fsm.util.resolver.IResolver;
 import com.monday_consulting.maven.plugins.fsm.util.resolver.MavenGetArtifactsResolver;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.*;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XmlStreamWriter;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomWriter;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
@@ -80,20 +80,15 @@ import java.util.Map;
         requiresDependencyResolution = ResolutionScope.COMPILE)
 class DependencyToXMLMojo extends AbstractMojo {
 
-    /**
-     * The entry point to Aether, i.e. the component doing all the work.
-     */
-    @Component
-    private RepositorySystem repoSystem;
-
     @Component
     private ProjectBuilder projectBuilder;
 
     /**
-     * The current repository/network configuration of Maven.
+     * The Maven Session.
      */
-    @Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
-    private RepositorySystemSession repoSession;
+    @SuppressWarnings("CanBeFinal")
+    @Parameter(defaultValue = "${session}", readonly = true, required = true)
+    private MavenSession session;
 
     /**
      * The Maven-Project
@@ -126,6 +121,15 @@ class DependencyToXMLMojo extends AbstractMojo {
     private File targetXml;
 
     /**
+     * The entry point towards a Maven version independent way of resolving
+     * artifacts (handles both Maven 3.0 Sonatype and Maven 3.1+ eclipse Aether
+     * implementations).
+     */
+    @SuppressWarnings("CanBeFinal")
+    @Component
+    private ArtifactResolver artifactResolver;
+
+    /**
      * {@inheritDoc}
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -146,7 +150,7 @@ class DependencyToXMLMojo extends AbstractMojo {
                 getLog().debug("Enhance created Modules");
             }
 
-            final IResolver resolver = new MavenGetArtifactsResolver(getLog(), reactorProjects, repoSystem, repoSession, projectBuilder, mavenProject);
+            final IResolver resolver = new MavenGetArtifactsResolver(getLog(), session, artifactResolver, reactorProjects, projectBuilder, mavenProject);
             final Map<String, Module> modules = new HashMap<>();
             for (final ModuleType moduleType : config.getModules().getModule()) {
                 if (modules.containsKey(moduleType.getDependencyTagValueInXml())) {

@@ -234,6 +234,11 @@
             <version>2.3.6</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-artifact-transfer</artifactId>
+            <version>0.13.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.aether</groupId>
             <artifactId>aether-api</artifactId>
             <version>${eclipseAetherVersion}</version>
