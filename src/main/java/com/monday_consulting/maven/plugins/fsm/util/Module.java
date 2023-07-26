@@ -136,7 +136,7 @@ public class Module {
 
             if (artifactType.equals("jar") || artifactType.equals("bundle")) {
                 log.debug("Adding the project artifact itself: " + projectArtifact.getArtifactId() +
-                         ", with absolute file: " + projectArtifact.getFile().getAbsoluteFile() + "; finalname: " +
+                         ", with file: " + projectArtifact.getFile() + "; finalname: " +
                          mavenProject.getBuild().getFinalName());
                 resolvedModuleArtifacts.add(projectArtifact);
             }
@@ -193,7 +193,19 @@ public class Module {
 
     private void addArtifactsToDom(Xpp3Dom dom, List<Artifact> filteredModuleArtifacts, HashSet<String> history) {
         for (final Artifact artifact : filteredModuleArtifacts) {
-            String value = getPrefix() + artifact.getFile().getName();
+            final File artifactFile = artifact.getFile();
+
+            if (artifactFile == null) {
+                final String unresolvedArtifact = String.format("%s:%s:%s:%s", artifact.getGroupId(),
+                        artifact.getArtifactId(), artifact.getType(), artifact.getVersion());
+                final String errorMsg = "The required artifact " + unresolvedArtifact + " could not be" +
+                        " resolved. Please ensure that all modules have been build or execute the plugin from the" +
+                        " project root.";
+                log.error(errorMsg);
+                throw new RuntimeException(errorMsg);
+            }
+
+            String value = getPrefix() + artifactFile.getName();
 
             if (!history.contains(value)) {
                 history.add(value);
@@ -376,14 +388,25 @@ public class Module {
         File baseDir = new File(mavenProject.getBasedir() + targetFileDir);
 
         if (!baseDir.exists()) {
-            final File artifactFile = mavenProject.getArtifact().getFile();
+            Artifact artifact = mavenProject.getArtifact();
+            if (artifact == null || artifact.getFile() == null) {
+                final String unresolvedArtifact = String.format("%s:%s:%s:%s", mavenProject.getGroupId(),
+                        mavenProject.getArtifactId(), mavenProject.getPackaging(), mavenProject.getVersion());
+                final String errorMsg = "The required artifact " + unresolvedArtifact + " could not be" +
+                        " resolved. Please ensure that all modules have been build or execute the plugin from the" +
+                        " project root.";
+                log.error(errorMsg);
+                throw new RuntimeException(errorMsg);
+            }
+
+            final File artifactFile = artifact.getFile();
             try (final ZipFile fileToExtract = new ZipFile(artifactFile)) {
 
                 if (!fileToExtract.isValidZipFile()) {
-                    throw new ZipException("No valid ZIP file: " + mavenProject.getArtifact().getFile());
+                    throw new ZipException("No valid ZIP file: " + artifact.getFile());
                 }
                 if (fileToExtract.isEncrypted()) {
-                    throw new ZipException("The ZIP file is password encrypted: " + mavenProject.getArtifact().getFile());
+                    throw new ZipException("The ZIP file is password encrypted: " + artifact.getFile());
                 }
 
                 baseDir = new File(mavenProject.getParent().getBasedir().getAbsolutePath() + targetFileDir);
