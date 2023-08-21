@@ -16,12 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugins.annotations.*;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectHelper;
-
-import java.io.File;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 
 /**
  * This Mojo attaches the assembled FSM as a project artifact.
@@ -29,36 +25,13 @@ import java.io.File;
  * @author Oliver Degener
  * @since 1.6.0
  */
+@SuppressWarnings("unused")
 @Mojo(name = "attachFSM", defaultPhase = LifecyclePhase.PACKAGE)
-class AttachFSMMojo extends AbstractMojo {
-
-    @Component
-    private MavenProjectHelper projectHelper;
-
-    /**
-     * The filename of the assembled distribution file.
-     */
-    @Parameter(property = "fsmFile", defaultValue = "${project.artifactId}-${project.version}.fsm.zip")
-    private String fsmFile;
-
-    /**
-     * The artifact type, defaults to fsm.
-     */
-    @Parameter(property = "type", defaultValue = "fsm")
-    private String type;
-
-    @Parameter(defaultValue = "${project}", readonly = true, required = true)
-    private MavenProject project;
+class AttachFSMMojo extends BaseFSMMojo {
 
     @Override
     public void execute() {
-        final String targetDir =  project.getBuild().getDirectory();
-
-        String path = targetDir.concat(File.separator).concat(fsmFile);
-        File file = new File(path);
-
-        getLog().info("Attaching '" + type + "' artifact: " + file.getAbsolutePath());
-        projectHelper.attachArtifact(project, type, null, file);
+        attachFSM();
     }
 
 }

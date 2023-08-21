@@ -31,6 +31,8 @@ public class ConflictResolver {
                         // first occurrence wins
                         log.info("Resolving conflict for " + conflictId + " with first seen version " + artifact.getVersion());
                         resolvedConflicts.put(conflictId, artifact);
+                    } else {
+                        log.debug("Alternative version for " + conflictId + " is " + artifact.getVersion());
                     }
                 }
             });

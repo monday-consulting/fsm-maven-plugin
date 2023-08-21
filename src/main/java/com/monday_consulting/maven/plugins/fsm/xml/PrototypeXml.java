@@ -1,4 +1,4 @@
-package com.monday_consulting.maven.plugins.fsm.util;
+package com.monday_consulting.maven.plugins.fsm.xml;
 
 /*
 Copyright 2016-2020 Monday Consulting GmbH
@@ -16,6 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import com.monday_consulting.maven.plugins.fsm.util.Module;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -41,10 +42,15 @@ public class PrototypeXml {
     private final List<PrototypeXml.DependencyJoint> dependencyJointList;
     private Xpp3Dom prototypeDom;
 
-    public PrototypeXml(final Log log, final File prototypeXml) throws XmlPullParserException, IOException {
+    public PrototypeXml(final Log log, final File prototypeXml) {
         this.dependencyJointList = new ArrayList<>();
         this.log = log;
-        this.prototypeDom = Xpp3DomBuilder.build(new XmlStreamReader(prototypeXml));
+
+        try {
+            this.prototypeDom = Xpp3DomBuilder.build(new XmlStreamReader(prototypeXml));
+        } catch (XmlPullParserException | IOException e) {
+            throw new RuntimeException("Failed to parse Module prototype " + prototypeXml, e);
+        }
 
         if (log.isDebugEnabled()) {
             this.log.debug("Getting dependency-joints\nDependency-Joints to fill:");
@@ -52,7 +58,7 @@ public class PrototypeXml {
 
         for (final Xpp3Dom xpp3Dom : new Xpp3DomIterator(prototypeDom)) {
             if (xpp3Dom.getName().equals("dependencies")) {
-                if (xpp3Dom.getValue().equals("")) {
+                if (xpp3Dom.getValue().isEmpty()) {
                     log.error("Prototype-Xml-Error:\nTried to retrieve dependency-joint, but because its value was empty, no connection to a module can be made.");
                 }
                 dependencyJointList.add(new DependencyJoint(xpp3Dom.getValue(), xpp3Dom));
@@ -69,6 +75,8 @@ public class PrototypeXml {
      * @throws MojoExecutionException in case of configuration problems.
      */
     public void fillPrototypeDom(final Map<String, Module> moduleList) throws MojoExecutionException, MojoFailureException {
+        log.debug("Enhance Prototype for TargetXml");
+
         for (final DependencyJoint dJ : dependencyJointList) {
             Module moduleToInsert = moduleList.get(dJ.getDependencyTagValue());
 

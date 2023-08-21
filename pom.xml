@@ -4,7 +4,7 @@
     <groupId>com.monday-consulting.maven.plugins</groupId>
     <artifactId>fsm-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>1.8.2</version>
+    <version>2.0.0</version>
     <name>fsm-maven-plugin</name>
     <url>https://www.monday-consulting.com</url>
 
@@ -73,29 +73,29 @@
     </licenses>
 
     <prerequisites>
-        <maven>3.1.0</maven>
+        <maven>3.3.9</maven>
     </prerequisites>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <compile.source.jdk>1.8</compile.source.jdk>
-        <compile.target.jdk>1.8</compile.target.jdk>
+        <compile.source.jdk>11</compile.source.jdk>
+        <compile.target.jdk>11</compile.target.jdk>
 
         <mavenVersion>3.3.9</mavenVersion>
-        <eclipseAetherVersion>1.1.0</eclipseAetherVersion>
 
         <junit.version>5.9.0</junit.version>
 
         <maven.plugin.plugin>3.6.4</maven.plugin.plugin>
         <maven.sonatype.nexus.plugin>1.6.13</maven.sonatype.nexus.plugin>
         <maven.jaxb2.plugin>1.5</maven.jaxb2.plugin>
-        <maven.resources.plugin>3.3.0</maven.resources.plugin>
-        <maven.gpg.plugin>1.6</maven.gpg.plugin>
-        <maven.clean.plugin>3.2.0</maven.clean.plugin>
-        <maven.compiler.plugin>3.10.1</maven.compiler.plugin>
+        <maven.resources.plugin>3.3.1</maven.resources.plugin>
+        <maven.gpg.plugin>3.1.0</maven.gpg.plugin>
+        <maven.invoker.plugin>3.6.0</maven.invoker.plugin>
+        <maven.clean.plugin>3.3.1</maven.clean.plugin>
+        <maven.compiler.plugin>3.11.0</maven.compiler.plugin>
         <maven.jar.plugin>3.3.0</maven.jar.plugin>
-        <maven.surefire.plugin>2.22.2</maven.surefire.plugin>
+        <maven.surefire.plugin>3.1.2</maven.surefire.plugin>
     </properties>
 
     <build>
@@ -206,6 +206,18 @@
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+            <version>${mavenVersion}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>${mavenVersion}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
             <version>${mavenVersion}</version>
             <scope>provided</scope>
@@ -221,19 +233,9 @@
             <version>2.3.6</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-api</artifactId>
-            <version>${eclipseAetherVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-util</artifactId>
-            <version>${eclipseAetherVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-impl</artifactId>
-            <version>${eclipseAetherVersion}</version>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-artifact-transfer</artifactId>
+            <version>0.13.1</version>
         </dependency>
         <dependency>
             <groupId>net.lingala.zip4j</groupId>
@@ -251,6 +253,12 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>4.5.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -305,7 +313,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-invoker-plugin</artifactId>
-                        <version>3.3.0</version>
+                        <version>${maven.invoker.plugin}</version>
                         <configuration>
                             <projectsDirectory>src/it</projectsDirectory>
                             <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
@@ -316,6 +324,13 @@
                             <mavenExecutable>${maven.home}/bin/mvnDebug</mavenExecutable>
                             -->
                         </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.apache.groovy</groupId>
+                                <artifactId>groovy-xml</artifactId>
+                                <version>4.0.13</version>
+                            </dependency>
+                        </dependencies>
                         <executions>
                             <execution>
                                 <phase>integration-test</phase>

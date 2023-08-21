@@ -16,10 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import com.monday_consulting.maven.plugins.fsm.jaxb.ModuleType;
-import com.monday_consulting.maven.plugins.fsm.util.Module;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
+import com.monday_consulting.maven.plugins.fsm.maven.MavenCoordinate;
+import org.apache.maven.project.MavenProject;
 
 import java.util.List;
 
@@ -30,14 +28,14 @@ import java.util.List;
  * @since 1.0.0
  */
 public interface IResolver {
+
     /**
-     * Resolve the dependencies for a maven artifact.
+     * Resolve a MavenProject for every artifact.
+     * The MavenProject may be part of the reactor, part of the local workspace or a virtual project from a repository.
      *
-     * @param moduleType The module component configuration.
-     * @param scopes     The dependency scopes that will be included.
+     * @param artifacts This list of artifacts represented as a coordinate
      * @return The module component.
-     * @throws MojoFailureException   in case if no dependency for the configured module type could be found or could not be resolved.
-     * @throws MojoExecutionException in case of a general failures.
      */
-    Module resolve(ModuleType moduleType, List<String> scopes) throws MojoFailureException, MojoExecutionException;
+    List<MavenProject> resolveMavenProjects(List<MavenCoordinate> artifacts);
+
 }
