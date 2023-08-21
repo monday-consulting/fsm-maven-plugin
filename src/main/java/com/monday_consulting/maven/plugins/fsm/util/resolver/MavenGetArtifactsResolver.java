@@ -16,21 +16,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import com.monday_consulting.maven.plugins.fsm.jaxb.ModuleType;
-import com.monday_consulting.maven.plugins.fsm.util.Module;
+import com.monday_consulting.maven.plugins.fsm.maven.MavenCoordinate;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.*;
 import org.apache.maven.shared.transfer.artifact.DefaultArtifactCoordinate;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.repository.LocalRepositoryManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -66,18 +63,11 @@ public class MavenGetArtifactsResolver implements IResolver {
     /**
      * {@inheritDoc}
      */
-    public Module resolve(final ModuleType moduleType, final List<String> scopes) throws MojoFailureException, MojoExecutionException {
-        log.debug("Resolving module for dependency tag " + moduleType.getDependencyTagValueInXml());
-        final Module module = new Module(log, moduleType, scopes);
-        List<MavenProject> mavenProjects = getMavenProjects(module);
-        module.setProjects(mavenProjects);
-        return module;
-    }
-
-    private List<MavenProject> getMavenProjects(final Module module) {
+    @Override
+    public List<MavenProject> resolveMavenProjects(final List<MavenCoordinate> artifacts) {
         List<MavenProject> mavenProjects = new ArrayList<>();
 
-        for (final DefaultArtifact artifactInfo : module.getArtifacts()) {
+        for (final MavenCoordinate artifactInfo : artifacts) {
             // Order: reactor project, local project, maven repository
             MavenProject mavenProject = getMavenProjectViaReactor(artifactInfo);
             if (mavenProject != null) {
@@ -101,7 +91,7 @@ public class MavenGetArtifactsResolver implements IResolver {
         }).collect(Collectors.toList());
     }
 
-    private MavenProject getMavenProjectViaReactor(final DefaultArtifact artifact) {
+    private MavenProject getMavenProjectViaReactor(final MavenCoordinate artifact) {
         MavenProject mavenProject = null;
         boolean moduleInReactor = false;
 
@@ -122,7 +112,7 @@ public class MavenGetArtifactsResolver implements IResolver {
         return mavenProject;
     }
 
-    private MavenProject getMavenProjectViaLocalWorkspace(final DefaultArtifact artifact) {
+    private MavenProject getMavenProjectViaLocalWorkspace(final MavenCoordinate artifact) {
         MavenProject rootProject = parentMavenProject.getParent();
         if (rootProject != null && rootProject.getGroupId().equals(artifact.getGroupId())) {
             log.debug("Module " + artifact.getGroupId() + ":" + artifact.getArtifactId()
@@ -157,36 +147,40 @@ public class MavenGetArtifactsResolver implements IResolver {
         return new DefaultProjectBuildingRequest(session.getProjectBuildingRequest()).setResolveDependencies(true);
     }
 
-    private DefaultArtifact artifactWithVersion(DefaultArtifact artifact, String version) {
-        return new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(),
-                artifact.getExtension(), version);
+    private Artifact coordinateToArtifact(MavenCoordinate artifactCoordinate) {
+        return coordinateToArtifact(artifactCoordinate, artifactCoordinate.getExtension());
     }
 
-    private MavenProject getMavenProjectViaRepository(DefaultArtifact artifact) {
+    private Artifact coordinateToArtifact(MavenCoordinate artifactCoordinate, String type) {
+        return new DefaultArtifact(artifactCoordinate.getGroupId(), artifactCoordinate.getArtifactId(),
+                artifactCoordinate.getVersion(), null, type,
+                artifactCoordinate.getClassifier(), new DefaultArtifactHandler(type));
+    }
+
+    private MavenProject getMavenProjectViaRepository(MavenCoordinate artifact) {
         log.debug("Module " + artifact.getGroupId() + ":" + artifact.getArtifactId()
                 + " not found in reactor, trying to find it in the local repository.");
         try {
             final ProjectBuildingRequest request = buildingRequest();
             request.setProject(null);
 
-            final LocalRepositoryManager localRepositoryManager = session.getRepositorySession().getLocalRepositoryManager();
-            final File repoBasedir = localRepositoryManager.getRepository().getBasedir();
+            final ArtifactRepository localRepository = session.getLocalRepository();
+            final File repoBasedir = new File(localRepository.getBasedir());
 
             if ((artifact.getVersion() == null || artifact.getVersion().isEmpty())
                     && parentMavenProject.getGroupId().equals(artifact.getGroupId())) {
                 log.info("Assuming project version " + parentMavenProject.getVersion()
                         + " for artifact " + artifact);
-                artifact = artifactWithVersion(artifact, parentMavenProject.getVersion());
+                artifact.setVersion(parentMavenProject.getVersion());
             }
 
-            final String pathForLocalArtifact = localRepositoryManager.getPathForLocalArtifact(artifact);
+            final String pathForLocalArtifact = localRepository.pathOf(coordinateToArtifact(artifact));
             final File moduleArtifactFile = new File(repoBasedir, pathForLocalArtifact);
 
             // the module pom artifact to build maven project
-            final DefaultArtifact pomArtifact = new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(),
-                    artifact.getClassifier(), "pom", artifact.getVersion());
+            final Artifact pomArtifact = coordinateToArtifact(artifact, "pom");
 
-            final String localArtifactPath = localRepositoryManager.getPathForLocalArtifact(pomArtifact);
+            final String localArtifactPath = localRepository.pathOf(pomArtifact);
 
             final File projectFile = new File(repoBasedir, localArtifactPath);
 
@@ -220,15 +214,15 @@ public class MavenGetArtifactsResolver implements IResolver {
         }
     }
 
-    private void resolveArtifact(final DefaultArtifact moduleArtifact) {
-        log.info("Try to resolve artifact for " + moduleArtifact.getArtifactId() + " from remote repository...");
+    private void resolveArtifact(final MavenCoordinate mavenCoordinate) {
+        log.info("Try to resolve artifact for " + mavenCoordinate.getArtifactId() + " from remote repository...");
 
         DefaultArtifactCoordinate coordinate = new DefaultArtifactCoordinate();
-        coordinate.setGroupId(moduleArtifact.getGroupId());
-        coordinate.setArtifactId(moduleArtifact.getArtifactId());
-        coordinate.setVersion(moduleArtifact.getVersion());
-        coordinate.setExtension(moduleArtifact.getExtension());
-        coordinate.setClassifier(moduleArtifact.getClassifier());
+        coordinate.setGroupId(mavenCoordinate.getGroupId());
+        coordinate.setArtifactId(mavenCoordinate.getArtifactId());
+        coordinate.setVersion(mavenCoordinate.getVersion());
+        coordinate.setExtension(mavenCoordinate.getExtension());
+        coordinate.setClassifier(mavenCoordinate.getClassifier());
 
         try {
             artifactResolver.resolveArtifact(buildingRequest(), coordinate);

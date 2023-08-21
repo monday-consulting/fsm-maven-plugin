@@ -20,13 +20,11 @@ import com.monday_consulting.maven.plugins.fsm.jaxb.*;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.eclipse.aether.artifact.DefaultArtifact;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,71 +44,91 @@ public class Module {
     private static final String RESOURCE_TAG = "resource";
     private static final String ROOT_TAG = "root";
 
+    /**
+     * The lib path for JARs in the FSM.
+     */
+    public static final String LIB_PATH = "lib/";
+
     private final Log log;
     private final ModuleType moduleType;
-    private final String prefix;
     private final List<String> dependencyScopes;
     private final String dependencyTagValueInXml;
     private final Resource resource;
-    private final List<DefaultArtifact> artifacts = new ArrayList<>();
-
-    private List<MavenProject> projects;
+    private final List<Artifact> dependencies;
 
     private final Map<String, IncludeType> includesMap;
     private final Map<String, ExcludeType> excludesMap;
+    private final List<MavenProject> projects;
 
     /**
      * @param log        The logger.
      * @param moduleType The module component configuration.
      * @param scopes     The dependency scopes that will be included (like compile, runtime).
-     * @throws MojoExecutionException in case of a general failures.
      */
-    public Module(final Log log, final ModuleType moduleType, final List<String> scopes) throws MojoExecutionException,
-            MojoFailureException {
+    public Module(final Log log, final ModuleType moduleType, final List<MavenProject> mavenProjects,
+                  final List<String> scopes) throws MojoFailureException {
         this.log = log;
         this.moduleType = moduleType;
 
-        if (moduleType.getId() == null && moduleType.getIds() == null) {
-            throw new MojoExecutionException("Module construction failed: Missing module property '<id>'.");
-        }
-
-        if (moduleType.getId() != null) {
-            artifacts.add(parseID(moduleType.getId()));
-        }
-
-        if (moduleType.getIds() != null) {
-            for (String id : moduleType.getIds().getId()) {
-                artifacts.add(parseID(id));
-            }
-        }
-
-        prefix = this.moduleType.getPrefix();
         dependencyScopes = scopes;
         dependencyTagValueInXml = this.moduleType.getDependencyTagValueInXml();
         resource = this.moduleType.getResource();
 
         includesMap = getIncludesMap();
         excludesMap = getExcludesMap(includesMap);
-    }
 
-    private static DefaultArtifact parseID(String str) throws MojoExecutionException {
-        final String[] coords = str.split(":");
-
-        if (coords.length < 3) {
-            throw new MojoExecutionException("Incomplete artifact ID specified: " + str);
+        if (moduleType.getPrefix() != null) {
+            if (LIB_PATH.equals(moduleType.getPrefix())) {
+                log.info("The module prefix '<prefix>lib/</prefix>' equals the default convention and" +
+                        " should be removed as the parameter is no longer considered.");
+            } else {
+                log.warn("The <prefix> element in the module descriptor has been removed and has no effect." +
+                        " All dependencies will be placed under '/lib' by convention.");
+            }
         }
 
-        return new DefaultArtifact(coords[0], coords[1],
-                                   coords.length > 4 ? coords[4] : null, coords[2], coords.length > 3 ? coords[3] : null);
+        this.projects = mavenProjects;
+
+        this.dependencies = resolveDependencies(mavenProjects);
+    }
+
+    public List<Artifact> getDependencies() {
+        return dependencies;
     }
 
     private Xpp3Dom getWebResourceTmpDom(final String name, final String dirPath) {
         final Xpp3Dom dom = new Xpp3Dom(RESOURCE_TAG);
         // fix windows paths to work with FirstSpirit module loader
         dom.setAttribute("target", "/" + dirPath.replace("\\", "/"));
-        final String value = getResource().getPrefix() != null ? getResource().getPrefix() + name : name;
+        final String value = resource.getPrefix() != null ? resource.getPrefix() + name : name;
         dom.setValue(value.replace("\\", "/"));
         return dom;
+    }
+
+    protected List<Artifact> resolveDependencies(List<MavenProject> projects) {
+        final Set<Artifact> resolvedModuleArtifacts = new LinkedHashSet<>();
+
+        for (final MavenProject mavenProject : projects) {
+            log.info("Resolving dependencies for module " + mavenProject.getGroupId()
+                    + ":" + mavenProject.getArtifactId());
+
+            resolvedModuleArtifacts.addAll(mavenProject.getArtifacts());
+
+            final Artifact projectArtifact = mavenProject.getArtifact();
+            final String artifactType = projectArtifact.getType();
+
+            if (artifactType.equals("jar") || artifactType.equals("bundle")) {
+                log.debug("Adding the project artifact itself: " + projectArtifact.getArtifactId() +
+                        ", with file: " + projectArtifact.getFile() + "; finalname: " +
+                        mavenProject.getBuild().getFinalName());
+                resolvedModuleArtifacts.add(projectArtifact);
+            }
+        }
+
+        List<Artifact> filteredModuleArtifacts = getFilteredModuleArtifacts(resolvedModuleArtifacts);
+
+        ConflictResolver conflictResolver = new ConflictResolver(log, dependencyTagValueInXml);
+        return conflictResolver.resolveVersionConflicts(filteredModuleArtifacts);
     }
 
     /**
@@ -123,41 +141,23 @@ public class Module {
         final Xpp3Dom dom = new Xpp3Dom(ROOT_TAG);
         final HashSet<String> history = new HashSet<>();
 
-        final Set<Artifact> resolvedModuleArtifacts = new LinkedHashSet<>();
+        for (MavenProject project : projects) {
 
-        for (final MavenProject mavenProject : getProjects()) {
-            log.info("Resolving dependencies for module " + mavenProject.getGroupId()
-                    + ":" + mavenProject.getArtifactId());
-
-            resolvedModuleArtifacts.addAll(mavenProject.getArtifacts());
-
-            final Artifact projectArtifact = mavenProject.getArtifact();
+            final Artifact projectArtifact = project.getArtifact();
             final String artifactType = projectArtifact.getType();
 
-            if (artifactType.equals("jar") || artifactType.equals("bundle")) {
-                log.debug("Adding the project artifact itself: " + projectArtifact.getArtifactId() +
-                         ", with file: " + projectArtifact.getFile() + "; finalname: " +
-                         mavenProject.getBuild().getFinalName());
-                resolvedModuleArtifacts.add(projectArtifact);
-            }
-
             if (artifactType.equals("war") || artifactType.equals("zip")) {
-                addArchiveFileIncludesToDom(dom, mavenProject, history);
+                addArchiveFileIncludesToDom(dom, project, history);
             }
         }
 
-        List<Artifact> filteredModuleArtifacts = getFilteredModuleArtifacts(resolvedModuleArtifacts);
-
-        ConflictResolver conflictResolver = new ConflictResolver(log, dependencyTagValueInXml);
-        List<Artifact> moduleArtifacts = conflictResolver.resolveVersionConflicts(filteredModuleArtifacts);
-
-        if (moduleArtifacts.isEmpty()) {
+        if (dependencies.isEmpty()) {
             log.warn("No artifacts found for dependency tag '" + dependencyTagValueInXml + "'. This is" +
                     " most likely an error in the build configuration. Please make sure that all reactor projects" +
                     " have been processed before running the FSM plugin and have not been modified after packaging.");
         }
 
-        addArtifactsToDom(dom, moduleArtifacts, history);
+        addArtifactsToDom(dom, dependencies, history);
         addIncludesToDom(dom, history);
         sortChildren(dom);
         return dom;
@@ -205,7 +205,7 @@ public class Module {
                 throw new RuntimeException(errorMsg);
             }
 
-            String value = getPrefix() + artifactFile.getName();
+            String value = LIB_PATH + artifactFile.getName();
 
             if (!history.contains(value)) {
                 history.add(value);
@@ -254,15 +254,13 @@ public class Module {
 
             File targetDir = extractArtifactToTargetDir(mavenProject);
 
-            final Resource res = getResource();
+            final Resource res = resource;
 
             if (res == null || res.getIncludes() == null || res.getIncludes().getInclude().isEmpty()) {
                 // if there are no resources or includes then there are no files to handle
                 return;
             }
-            if (res.getPrefix() == null || res.getPrefix().isEmpty()) {
-                log.warn("No <prefix> defined. Prefix would be set to root.");
-            }
+
             if (res.getWebXml() == null || res.getWebXml().isEmpty()) {
                 throw new MojoFailureException("Module " + mavenProject.getArtifactId() + " from archive type " +
                                                mavenProject.getArtifact().getType() + " detected. No <web-xml> defined.");
@@ -319,7 +317,7 @@ public class Module {
                     tmpDom.setAttribute("mode", moduleType.getFirstSpiritMode().trim());
                 }
 
-                tmpDom.setValue(getPrefix() + includeType.getFileName());
+                tmpDom.setValue(LIB_PATH + includeType.getFileName());
                 dom.addChild(tmpDom);
             }
         }
@@ -417,31 +415,4 @@ public class Module {
         return baseDir;
     }
 
-    private String getPrefix() {
-        return prefix;
-    }
-
-    public String getDependencyTagValueInXml() {
-        return dependencyTagValueInXml;
-    }
-
-    private Resource getResource() {
-        return resource;
-    }
-
-    private List<MavenProject> getProjects() {
-        return projects;
-    }
-
-    public void setProjects(List<MavenProject> projects) {
-        this.projects = projects;
-    }
-
-    public List<String> getDependencyScopes() {
-        return dependencyScopes;
-    }
-
-    public List<DefaultArtifact> getArtifacts() {
-        return artifacts;
-    }
 }
