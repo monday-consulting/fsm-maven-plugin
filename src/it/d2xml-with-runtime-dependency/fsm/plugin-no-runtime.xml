@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fsm-maven-plugin>
+    <!-- Override default scopes which is compile+runtime -->
+    <scopes>
+        <scope>compile</scope>
+    </scopes>
+    <modules>
+        <module>
+            <!-- use dependencies from this Maven project (../pom.xml) -->
+            <id>${project.groupId}:${project.artifactId}:${project.version}</id>
+
+            <!-- This matches the tag in prototype.module.xml -->
+            <dependencyTagValueInXml>fsm-dependencies</dependencyTagValueInXml>
+        </module>
+    </modules>
+</fsm-maven-plugin>
