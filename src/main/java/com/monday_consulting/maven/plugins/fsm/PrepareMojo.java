@@ -20,7 +20,7 @@ import java.util.Map;
 @Mojo(name = "prepare",
         defaultPhase = LifecyclePhase.PACKAGE,
         aggregator = true,
-        requiresDependencyResolution = ResolutionScope.COMPILE)
+        requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 class PrepareMojo extends BaseDependencyModuleMojo {
 
     /**

@@ -1,0 +1,16 @@
+<module>
+
+    <name>FSM Test Module</name>
+    <version>${project.version}</version>
+
+    <components>
+        <web-app>
+            <name>FSM Test Module</name>
+            <version>${project.version}</version>
+            <web-resources>
+                <!-- Tag from plugin.xml -->
+                <dependencies>fsm-dependencies</dependencies>
+            </web-resources>
+        </web-app>
+    </components>
+</module>
