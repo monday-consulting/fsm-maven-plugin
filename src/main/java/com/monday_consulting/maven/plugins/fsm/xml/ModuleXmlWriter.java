@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 public class ModuleXmlWriter {
 
@@ -41,7 +42,7 @@ public class ModuleXmlWriter {
 
         final Path moduleIsolatedXml = metaInf.resolve("module-isolated.xml");
         log.info("Writing isolated module descriptor: " + moduleIsolatedXml);
-        Files.copy(moduleXml, moduleIsolatedXml);
+        Files.copy(moduleXml, moduleIsolatedXml, StandardCopyOption.REPLACE_EXISTING);
 
         log.debug("Dependencies written to Module-XML:\n\t" + dom);
     }
