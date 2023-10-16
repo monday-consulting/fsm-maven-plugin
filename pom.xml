@@ -82,7 +82,7 @@
         <compile.source.jdk>11</compile.source.jdk>
         <compile.target.jdk>11</compile.target.jdk>
 
-        <mavenVersion>3.3.9</mavenVersion>
+        <mavenVersion>3.8.1</mavenVersion>
 
         <junit.version>5.9.0</junit.version>
 
