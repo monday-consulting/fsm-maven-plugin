@@ -1,0 +1,4 @@
+<module>
+    <name>Module with Legacy Descriptor</name>
+    <version>${project.version}</version>
+</module>
