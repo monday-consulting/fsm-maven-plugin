@@ -30,6 +30,14 @@ class PrepareMojo extends BaseDependencyModuleMojo {
     private boolean attach;
 
     /**
+     * When true, also generates a legacy module.xml descriptor next to the default
+     * module-isolated.xml. This is intended for backward compatibility with older
+     * environments and tools that still expect a non-isolated module descriptor.
+     */
+    @Parameter(property = "legacyModuleDescriptor", defaultValue = "false", required = true)
+    private boolean legacyModuleDescriptor;
+
+    /**
      * The xml the module data write to.
      */
     @Parameter(name = "fsm-root", defaultValue = "fsm-root")
@@ -54,7 +62,7 @@ class PrepareMojo extends BaseDependencyModuleMojo {
             Files.createDirectories(fsmRootPath);
 
             ModuleXmlWriter moduleXmlWriter = new ModuleXmlWriter(getLog());
-            moduleXmlWriter.writeDomToTarget(fsmRootPath, prototype.getPrototypeDom());
+            moduleXmlWriter.writeDomToTarget(fsmRootPath, prototype.getPrototypeDom(), legacyModuleDescriptor);
 
             getLog().debug("Copying dependencies to " + fsmRootPath);
             new DependencyAssembler(getLog()).copyDependenciesForModuleAssembly(fsmRootPath, modules.values());
