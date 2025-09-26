@@ -84,7 +84,7 @@
 
         <mavenVersion>3.3.9</mavenVersion>
 
-        <junit.version>5.9.0</junit.version>
+        <junit.version>5.11.4</junit.version>
 
         <maven.plugin.plugin>3.6.4</maven.plugin.plugin>
         <maven.sonatype.nexus.plugin>1.6.13</maven.sonatype.nexus.plugin>
@@ -258,7 +258,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>4.5.1</version>
+            <version>4.11.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
