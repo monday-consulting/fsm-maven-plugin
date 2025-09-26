@@ -87,9 +87,11 @@
         <junit.version>5.11.4</junit.version>
 
         <maven.plugin.plugin>3.6.4</maven.plugin.plugin>
-        <maven.sonatype.nexus.plugin>1.6.13</maven.sonatype.nexus.plugin>
+        <maven.sonatype.publishing.plugin>0.8.0</maven.sonatype.publishing.plugin>
         <maven.jaxb2.plugin>1.5</maven.jaxb2.plugin>
+        <maven.javadoc.plugin>3.12.0</maven.javadoc.plugin>
         <maven.resources.plugin>3.3.1</maven.resources.plugin>
+        <maven.source.plugin>3.3.1</maven.source.plugin>
         <maven.gpg.plugin>3.1.0</maven.gpg.plugin>
         <maven.invoker.plugin>3.6.1</maven.invoker.plugin>
         <maven.clean.plugin>3.5.0</maven.clean.plugin>
@@ -154,6 +156,36 @@
                     <packageName>com.monday_consulting.maven.plugins.fsm.jaxb</packageName>
                     <clearOutputDir>true</clearOutputDir>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven.source.plugin}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven.javadoc.plugin}</version>
+                <configuration>
+                    <doclint>all,-missing</doclint>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>create-javadoc</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -293,14 +325,13 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>${maven.sonatype.nexus.plugin}</version>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>${maven.sonatype.publishing.plugin}</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <serverId>sonatype-nexus</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                            <publishingServerId>sonatype-central</publishingServerId>
+                            <autoPublish>true</autoPublish>
                         </configuration>
                     </plugin>
                 </plugins>
