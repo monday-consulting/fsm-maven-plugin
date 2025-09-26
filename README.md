@@ -18,7 +18,7 @@ The FSM Maven plugin is published on Maven Central:
     <dependency>
       <groupId>com.monday-consulting.maven.plugins</groupId>
       <artifactId>fsm-maven-plugin</artifactId>
-      <version>2.0.2</version>
+      <version>2.1.0</version>
     </dependency>
 ```
 
