@@ -16,10 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import jakarta.xml.bind.ValidationEvent;
+import jakarta.xml.bind.ValidationEventHandler;
 import org.apache.maven.plugin.logging.Log;
-
-import javax.xml.bind.ValidationEvent;
-import javax.xml.bind.ValidationEventHandler;
 
 /**
  * Handler for the xml validation.
