@@ -86,7 +86,7 @@
 
         <junit.version>5.11.4</junit.version>
 
-        <maven.plugin.plugin>3.6.4</maven.plugin.plugin>
+        <maven.plugin.plugin>3.15.1</maven.plugin.plugin>
         <maven.sonatype.publishing.plugin>0.8.0</maven.sonatype.publishing.plugin>
         <maven.jaxb2.plugin>1.5</maven.jaxb2.plugin>
         <maven.javadoc.plugin>3.12.0</maven.javadoc.plugin>
@@ -214,12 +214,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>${maven.plugin.plugin}</version>
-                <executions>
-                    <execution>
-                        <id>default-descriptor</id>
-                        <phase>process-classes</phase>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
