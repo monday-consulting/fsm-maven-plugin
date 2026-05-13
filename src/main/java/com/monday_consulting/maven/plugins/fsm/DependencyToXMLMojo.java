@@ -49,6 +49,7 @@ import java.util.Map;
 @Mojo(name = "dependencyToXML",
         defaultPhase = LifecyclePhase.PACKAGE,
         aggregator = true,
+        threadSafe = true,
         requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 class DependencyToXMLMojo extends BaseDependencyModuleMojo {
 

@@ -26,7 +26,7 @@ import org.apache.maven.plugins.annotations.Mojo;
  * @since 1.6.0
  */
 @SuppressWarnings("unused")
-@Mojo(name = "attachFSM", defaultPhase = LifecyclePhase.PACKAGE)
+@Mojo(name = "attachFSM", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true)
 class AttachFSMMojo extends BaseFSMMojo {
 
     @Override

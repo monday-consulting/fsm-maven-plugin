@@ -20,6 +20,7 @@ import java.util.Map;
 @Mojo(name = "prepare",
         defaultPhase = LifecyclePhase.PACKAGE,
         aggregator = true,
+        threadSafe = true,
         requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 class PrepareMojo extends BaseDependencyModuleMojo {
 
