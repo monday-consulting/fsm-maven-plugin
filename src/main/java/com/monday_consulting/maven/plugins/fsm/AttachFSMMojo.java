@@ -18,6 +18,9 @@ limitations under the License.
 
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.project.MavenProjectHelper;
+
+import javax.inject.Inject;
 
 /**
  * This Mojo attaches the assembled FSM as a project artifact.
@@ -28,6 +31,11 @@ import org.apache.maven.plugins.annotations.Mojo;
 @SuppressWarnings("unused")
 @Mojo(name = "attachFSM", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true)
 class AttachFSMMojo extends BaseFSMMojo {
+
+    @Inject
+    AttachFSMMojo(MavenProjectHelper projectHelper) {
+        super(projectHelper);
+    }
 
     @Override
     public void execute() {

@@ -10,7 +10,11 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.project.ProjectBuilder;
+import org.eclipse.aether.RepositorySystem;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,6 +47,13 @@ class PrepareMojo extends BaseDependencyModuleMojo {
      */
     @Parameter(name = "fsm-root", defaultValue = "fsm-root")
     private String fsmRoot;
+
+    @Inject
+    PrepareMojo(MavenProjectHelper mavenProjectHelper,
+                RepositorySystem repositorySystem,
+                ProjectBuilder projectBuilder) {
+        super(mavenProjectHelper, repositorySystem, projectBuilder);
+    }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {

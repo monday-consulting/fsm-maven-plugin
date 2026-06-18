@@ -1,7 +1,6 @@
 package com.monday_consulting.maven.plugins.fsm.xml;
 
 import org.apache.maven.plugin.logging.Log;
-import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XmlStreamWriter;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -69,9 +68,9 @@ public class ModuleXmlWriter {
     }
 
     private void writeFile(final File file, final Xpp3Dom dom) throws IOException {
-        final XmlStreamWriter writer = WriterFactory.newXmlWriter(file);
-        final PrettyPrintXMLWriter pretty = new PrettyPrintXMLWriter(writer);
-        Xpp3DomWriter.write(pretty, dom);
-        writer.close();
+        try (final XmlStreamWriter writer = new XmlStreamWriter(file)) {
+            final PrettyPrintXMLWriter pretty = new PrettyPrintXMLWriter(writer);
+            Xpp3DomWriter.write(pretty, dom);
+        }
     }
 }
