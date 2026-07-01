@@ -2,7 +2,7 @@
 
 You can use this Maven plugin to generate XML descriptors for FirstSpirit modules.
 
-Make sure you use Maven 3.3 or newer when integrating this plugin into your workspace.
+Make sure you use Maven 3.8 or newer when integrating this plugin into your workspace.
 
 **Attention:** Due to internal changes in Maven 3.8.8 or 3.9.0 and newer, incomplete module.xml files and
 FirstSpirit modules may be created with the old `dependencyToXML` goal. Therefore, you should migrate to
