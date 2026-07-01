@@ -2,6 +2,8 @@ package com.monday_consulting.maven.plugins.fsm;
 
 import com.monday_consulting.maven.plugins.fsm.assembly.DependencyAssembler;
 import com.monday_consulting.maven.plugins.fsm.util.Module;
+import com.monday_consulting.maven.plugins.fsm.validation.LibOverheadCheck;
+import com.monday_consulting.maven.plugins.fsm.validation.LibReferenceValidator;
 import com.monday_consulting.maven.plugins.fsm.xml.ModuleXmlWriter;
 import com.monday_consulting.maven.plugins.fsm.xml.PrototypeXml;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -48,6 +50,31 @@ class PrepareMojo extends BaseDependencyModuleMojo {
     @Parameter(name = "fsm-root", defaultValue = "fsm-root")
     private String fsmRoot;
 
+    /**
+     * When true (default), validates the assembled FSM after the descriptor is written and the
+     * dependencies are copied. Currently, this verifies that every library referenced in the module
+     * descriptor is present in the lib directory (a missing library fails the build) and warns about
+     * JARs in the lib directory that are not referenced by the descriptor. Further validation logic
+     * may be added under this flag in the future.
+     */
+    @Parameter(property = "validate", defaultValue = "true", required = true)
+    private boolean validate;
+
+    /**
+     * When true, analyses the assembled lib directory for size overhead caused by multiple versions
+     * of the same dependency and logs a warning (with statistics and the biggest offenders) when the
+     * estimated overhead exceeds {@link #libOverheadThreshold}. Off by default; only warns, never fails
+     * the build. Independent of {@link #validate}.
+     */
+    @Parameter(property = "warnOnLibOverhead", defaultValue = "true", required = true)
+    private boolean warnOnLibOverhead;
+
+    /**
+     * The lib-overhead percentage (see {@link #warnOnLibOverhead}) at or above which a warning is logged.
+     */
+    @Parameter(property = "libOverheadThreshold", defaultValue = "10", required = true)
+    private int libOverheadThreshold;
+
     @Inject
     PrepareMojo(MavenProjectHelper mavenProjectHelper,
                 RepositorySystem repositorySystem,
@@ -79,6 +106,15 @@ class PrepareMojo extends BaseDependencyModuleMojo {
             getLog().debug("Copying dependencies to " + fsmRootPath);
             new DependencyAssembler(getLog()).copyDependenciesForModuleAssembly(fsmRootPath, modules.values());
             getLog().debug("Module dependencies were successfully copied.");
+
+            if (validate) {
+                new LibReferenceValidator(getLog())
+                        .validate(prototype.getPrototypeDom(), fsmRootPath);
+            }
+
+            if (warnOnLibOverhead) {
+                new LibOverheadCheck(getLog()).check(prototype.getPrototypeDom(), fsmRootPath, libOverheadThreshold);
+            }
 
             if (attach) {
                 attachFSM();

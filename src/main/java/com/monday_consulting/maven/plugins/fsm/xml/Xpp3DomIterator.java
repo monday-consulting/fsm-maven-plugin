@@ -31,12 +31,12 @@ import java.util.NoSuchElementException;
  * @author Kassim Hölting
  * @since 1.0.0
  */
-class Xpp3DomIterator implements Iterator<Xpp3Dom>, Iterable<Xpp3Dom> {
+public class Xpp3DomIterator implements Iterator<Xpp3Dom>, Iterable<Xpp3Dom> {
     private final LinkedList<Xpp3Dom> list = new LinkedList<>();
     private Xpp3Dom root;
     private Xpp3Dom current;
 
-    Xpp3DomIterator(final Xpp3Dom dom) {
+    public Xpp3DomIterator(final Xpp3Dom dom) {
         this.root = dom;
         list.add(root);
     }
