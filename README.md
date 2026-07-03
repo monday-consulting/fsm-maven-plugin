@@ -10,7 +10,7 @@ plug-in version 2.0.0 and the new `prepare` goal as quickly as possible.
 
 # Getting started
 
-## Maven Dependency [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.monday-consulting.maven.plugins/fsm-maven-plugin/badge.svg?style=flat)](http://mvnrepository.com/artifact/com.monday-consulting.maven.plugins/fsm-maven-plugin)
+## Maven Dependency [![Sonatype Central](https://maven-badges.sml.io/sonatype-central/com.monday-consulting.maven.plugins/fsm-maven-plugin/badge.svg?style=flat)](http://mvnrepository.com/artifact/com.monday-consulting.maven.plugins/fsm-maven-plugin)
 
 The FSM Maven plugin is published on Maven Central:
 
