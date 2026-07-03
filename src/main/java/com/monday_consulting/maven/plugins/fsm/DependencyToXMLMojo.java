@@ -22,7 +22,11 @@ import com.monday_consulting.maven.plugins.fsm.xml.ModuleXmlWriter;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.*;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.project.ProjectBuilder;
+import org.eclipse.aether.RepositorySystem;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -49,6 +53,7 @@ import java.util.Map;
 @Mojo(name = "dependencyToXML",
         defaultPhase = LifecyclePhase.PACKAGE,
         aggregator = true,
+        threadSafe = true,
         requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 class DependencyToXMLMojo extends BaseDependencyModuleMojo {
 
@@ -57,6 +62,11 @@ class DependencyToXMLMojo extends BaseDependencyModuleMojo {
      */
     @Parameter(defaultValue = "${targetXml}")
     private File targetXml;
+
+    @Inject
+    public DependencyToXMLMojo(MavenProjectHelper mavenProjectHelper, RepositorySystem repoSystem, ProjectBuilder projectBuilder) {
+        super(mavenProjectHelper, repoSystem, projectBuilder);
+    }
 
     /**
      * {@inheritDoc}

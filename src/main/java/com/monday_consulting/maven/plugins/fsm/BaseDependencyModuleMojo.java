@@ -13,11 +13,11 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.project.ProjectBuilder;
-import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
+import org.eclipse.aether.RepositorySystem;
 
 import java.io.File;
 import java.util.HashMap;
@@ -53,18 +53,16 @@ abstract class BaseDependencyModuleMojo extends BaseFSMMojo {
     @Parameter(defaultValue = "${reactorProjects}", readonly = true)
     protected List<MavenProject> reactorProjects;
 
-    /**
-     * The entry point towards a Maven version independent way of resolving
-     * artifacts (handles both Maven 3.0 Sonatype and Maven 3.1+ eclipse Aether
-     * implementations).
-     */
-    @SuppressWarnings("unused")
-    @Component
-    private ArtifactResolver artifactResolver;
+    private final RepositorySystem repoSystem;
+    private final ProjectBuilder projectBuilder;
 
-    @Component
-    @SuppressWarnings("unused")
-    private ProjectBuilder projectBuilder;
+    BaseDependencyModuleMojo(MavenProjectHelper mavenProjectHelper,
+                             RepositorySystem repoSystem,
+                             ProjectBuilder projectBuilder) {
+        super(mavenProjectHelper);
+        this.repoSystem = repoSystem;
+        this.projectBuilder = projectBuilder;
+    }
 
     /**
      * Log Projects and their resolved dependencies via MavenProject.getArtifacts().
@@ -94,7 +92,7 @@ abstract class BaseDependencyModuleMojo extends BaseFSMMojo {
 
     protected Map<String, Module> resolveModulesWithDependencies() throws MojoExecutionException, MojoFailureException {
         final FsmMavenPluginType config = parseConfig();
-        final IResolver resolver = new MavenGetArtifactsResolver(getLog(), session, artifactResolver, reactorProjects, projectBuilder, project);
+        final IResolver resolver = new MavenGetArtifactsResolver(getLog(), session, repoSystem, reactorProjects, projectBuilder, project);
         final Map<String, Module> modules = new HashMap<>();
         for (final ModuleType moduleType : config.getModules().getModule()) {
             if (modules.containsKey(moduleType.getDependencyTagValueInXml())) {

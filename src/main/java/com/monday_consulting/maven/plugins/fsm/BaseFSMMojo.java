@@ -1,7 +1,6 @@
 package com.monday_consulting.maven.plugins.fsm;
 
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
@@ -30,8 +29,11 @@ abstract class BaseFSMMojo extends AbstractMojo {
     private String type;
 
     @SuppressWarnings("unused")
-    @Component
-    private MavenProjectHelper projectHelper;
+    private final MavenProjectHelper projectHelper;
+
+    BaseFSMMojo(MavenProjectHelper projectHelper) {
+        this.projectHelper = projectHelper;
+    }
 
     void attachFSM() {
         final File file = Path.of(project.getBuild().getDirectory()).resolve(fsmFile).toFile();

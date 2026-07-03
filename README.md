@@ -2,7 +2,7 @@
 
 You can use this Maven plugin to generate XML descriptors for FirstSpirit modules.
 
-Make sure you use Maven 3.3 or newer when integrating this plugin into your workspace.
+Make sure you use Maven 3.8 or newer when integrating this plugin into your workspace.
 
 **Attention:** Due to internal changes in Maven 3.8.8 or 3.9.0 and newer, incomplete module.xml files and
 FirstSpirit modules may be created with the old `dependencyToXML` goal. Therefore, you should migrate to
@@ -10,15 +10,15 @@ plug-in version 2.0.0 and the new `prepare` goal as quickly as possible.
 
 # Getting started
 
-## Maven Dependency [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.monday-consulting.maven.plugins/fsm-maven-plugin/badge.svg?style=flat)](http://mvnrepository.com/artifact/com.monday-consulting.maven.plugins/fsm-maven-plugin)
+## Maven Dependency [![Sonatype Central](https://maven-badges.sml.io/sonatype-central/com.monday-consulting.maven.plugins/fsm-maven-plugin/badge.svg?style=flat)](http://mvnrepository.com/artifact/com.monday-consulting.maven.plugins/fsm-maven-plugin)
 
-The FSM Maven plugin is published on Maven Central:
+The FSM Maven plugin is published on Sonatype Central:
 
 ```
     <dependency>
       <groupId>com.monday-consulting.maven.plugins</groupId>
       <artifactId>fsm-maven-plugin</artifactId>
-      <version>2.1.0</version>
+      <version>2.2.0</version>
     </dependency>
 ```
 

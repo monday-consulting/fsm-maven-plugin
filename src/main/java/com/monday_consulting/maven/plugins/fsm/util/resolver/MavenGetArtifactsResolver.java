@@ -25,9 +25,9 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.*;
-import org.apache.maven.shared.transfer.artifact.DefaultArtifactCoordinate;
-import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
-import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -44,17 +44,17 @@ public class MavenGetArtifactsResolver implements IResolver {
 
     private final Log log;
     private final MavenSession session;
-    private final ArtifactResolver artifactResolver;
+    private final RepositorySystem repoSystem;
     private final List<MavenProject> reactorProjects;
     private final ProjectBuilder projectBuilder;
     private final MavenProject parentMavenProject;
 
-    public MavenGetArtifactsResolver(final Log log, final MavenSession session, final ArtifactResolver artifactResolver,
+    public MavenGetArtifactsResolver(final Log log, final MavenSession session, final RepositorySystem repoSystem,
                                      final List<MavenProject> reactorProjects, final ProjectBuilder projectBuilder,
                                      final MavenProject parentMavenProject) {
         this.log = log;
         this.session = session;
-        this.artifactResolver = artifactResolver;
+        this.repoSystem = repoSystem;
         this.reactorProjects = reactorProjects;
         this.projectBuilder = projectBuilder;
         this.parentMavenProject = parentMavenProject;
@@ -217,17 +217,22 @@ public class MavenGetArtifactsResolver implements IResolver {
     private void resolveArtifact(final MavenCoordinate mavenCoordinate) {
         log.info("Try to resolve artifact for " + mavenCoordinate.getArtifactId() + " from remote repository...");
 
-        DefaultArtifactCoordinate coordinate = new DefaultArtifactCoordinate();
-        coordinate.setGroupId(mavenCoordinate.getGroupId());
-        coordinate.setArtifactId(mavenCoordinate.getArtifactId());
-        coordinate.setVersion(mavenCoordinate.getVersion());
-        coordinate.setExtension(mavenCoordinate.getExtension());
-        coordinate.setClassifier(mavenCoordinate.getClassifier());
+        org.eclipse.aether.artifact.DefaultArtifact aetherArtifact = new org.eclipse.aether.artifact.DefaultArtifact(
+                mavenCoordinate.getGroupId(),
+                mavenCoordinate.getArtifactId(),
+                mavenCoordinate.getClassifier(),
+                mavenCoordinate.getExtension(),
+                mavenCoordinate.getVersion()
+        );
+
+        ArtifactRequest request = new ArtifactRequest();
+        request.setArtifact(aetherArtifact);
+        request.setRepositories(parentMavenProject.getRemoteProjectRepositories());
 
         try {
-            artifactResolver.resolveArtifact(buildingRequest(), coordinate);
-        } catch (ArtifactResolverException e) {
-            log.error("Failed to resolve artifact " + coordinate + ".");
+            repoSystem.resolveArtifact(session.getRepositorySession(), request);
+        } catch (ArtifactResolutionException e) {
+            log.error("Failed to resolve artifact " + aetherArtifact + ".");
             throw new RuntimeException(e);
         }
     }
