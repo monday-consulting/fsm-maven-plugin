@@ -28,8 +28,10 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Encapsulates the prototype-xml-file.
@@ -124,6 +126,22 @@ public class PrototypeXml {
 
     public Xpp3Dom getPrototypeDom() {
         return prototypeDom;
+    }
+
+    /**
+     * The set of {@code dependencyTagValueInXml} values that are actually referenced by a
+     * {@code <dependencies>} joint in the prototype module descriptor. Modules configured in the
+     * fsm-plugin.xml whose tag value is not contained here are not part of the assembled module and
+     * their dependencies do not need to be copied into the lib directory.
+     *
+     * @return the referenced dependency tag values (never {@code null}).
+     */
+    public Set<String> getReferencedDependencyTagValues() {
+        final Set<String> values = new LinkedHashSet<>();
+        for (final DependencyJoint dependencyJoint : dependencyJointList) {
+            values.add(dependencyJoint.getDependencyTagValue());
+        }
+        return values;
     }
 
     private final static class DependencyJoint {
