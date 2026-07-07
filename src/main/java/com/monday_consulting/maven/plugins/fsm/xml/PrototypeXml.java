@@ -28,8 +28,10 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,6 +42,9 @@ import java.util.Set;
  * @since 1.0.0
  */
 public class PrototypeXml {
+
+    private static final String ATTRIBUTE_INCLUDE = "fsm-include";
+
     private final Log log;
     private final List<PrototypeXml.DependencyJoint> dependencyJointList;
     private Xpp3Dom prototypeDom;
@@ -53,6 +58,8 @@ public class PrototypeXml {
         } catch (XmlPullParserException | IOException e) {
             throw new RuntimeException("Failed to parse Module prototype " + prototypeXml, e);
         }
+
+        filterDynamicIncludes();
 
         if (log.isDebugEnabled()) {
             this.log.debug("Getting dependency-joints\nDependency-Joints to fill:");
@@ -71,6 +78,62 @@ public class PrototypeXml {
     }
 
     /**
+     * Filters a prototype DOM structure by removing elements where the {@link  PrototypeXml#ATTRIBUTE_INCLUDE}
+     * attribute is explicitly set to {@code false}. This method is intended to dynamically adjust the prototype
+     * configuration based on inclusion flags, like Maven properties.
+     * <p>
+     * This method operates directly on the instance's {@code prototypeDom}, and any changes
+     * made are reflected in the original DOM.
+     */
+    protected void filterDynamicIncludes() {
+        final Iterator<Xpp3Dom> xpp3DomIterator = new Xpp3DomIterator(prototypeDom);
+        xpp3DomIterator.forEachRemaining(xpp3Dom -> {
+            final String include = xpp3Dom.getAttribute(ATTRIBUTE_INCLUDE);
+            if (include != null) {
+                // Remove custom attribute from module prototype
+                xpp3Dom.removeAttribute(ATTRIBUTE_INCLUDE);
+
+                // Filter element if the include attribute is set to false
+                if (!parseIncludeFlag(include, xpp3Dom.getName())) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Excluding element '" + xpp3Dom.getName() + "' from prototype because"
+                                + " attribute '" + ATTRIBUTE_INCLUDE + "' resolved to '" + include + "'.");
+                    }
+                    xpp3DomIterator.remove();
+                }
+            }
+        });
+    }
+
+    /**
+     * Strictly interprets the value of an {@link #ATTRIBUTE_INCLUDE} attribute. Only the boolean
+     * literals {@code true}/{@code false} (and {@code 1}/{@code 0}), ignoring case and surrounding
+     * whitespace, are accepted. Any other value — most notably an unresolved Maven property such as
+     * {@code ${my.flag}} — indicates a misconfiguration and fails the build instead of silently
+     * dropping the element, which {@link Boolean#parseBoolean(String)} would do for every value
+     * that is not {@code "true"}.
+     *
+     * @param value       the raw attribute value.
+     * @param elementName the name of the owning element, used for error reporting.
+     * @return {@code true} if the element should be kept, {@code false} if it should be removed.
+     */
+    private boolean parseIncludeFlag(final String value, final String elementName) {
+        switch (value.trim().toLowerCase(Locale.ROOT)) {
+            case "true":
+            case "1":
+                return true;
+            case "false":
+            case "0":
+                return false;
+            default:
+                throw new RuntimeException("Invalid value '" + value + "' for attribute '" + ATTRIBUTE_INCLUDE
+                        + "' on element '" + elementName + "' in the prototype module descriptor. Expected a boolean"
+                        + " (true/false). If you use a Maven property here, make sure it is defined and that resource"
+                        + " filtering is enabled for the prototype so the property gets replaced.");
+        }
+    }
+
+    /**
      * Consume the given prototype structure and add the components dependencies.
      *
      * @param moduleList The list of components for the to build module.
@@ -83,7 +146,11 @@ public class PrototypeXml {
             Module moduleToInsert = moduleList.get(dJ.getDependencyTagValue());
 
             if (moduleToInsert == null) {
-                throw new MojoExecutionException("For the to be added Dependencies for the DependencyTagValue: " + dJ.getDependencyTagValue() + " no configuration could be found.");
+                throw new MojoExecutionException("No module configuration could be found for the dependency tag '"
+                        + dJ.getDependencyTagValue() + "' referenced in the prototype module descriptor. Make sure a"
+                        + " matching <module> with this <dependencyTagValueInXml> exists in the config-xml and is not"
+                        + " excluded via fsm-include=\"false\". When you toggle an element in the prototype with"
+                        + " fsm-include, remember to drive its matching module in the config-xml with the same flag.");
             }
 
             final Xpp3Dom domToInsert = moduleToInsert.getModuleDependencyDom();
@@ -102,7 +169,7 @@ public class PrototypeXml {
                 int pos = -1;
                 final Xpp3Dom[] arr = parent.getChildren();
                 for (int i = 0; i < arr.length; i++) {
-                    if (arr[i].equals(dom)) {
+                    if (arr[i] == dom) {
                         pos = i;
                         break;
                     }
@@ -144,7 +211,7 @@ public class PrototypeXml {
         return values;
     }
 
-    private final static class DependencyJoint {
+    private static final class DependencyJoint {
         private final String dependencyTagValue;
         private final Xpp3Dom root;
 

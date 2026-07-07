@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fsm-maven-plugin>
+    <modules>
+        <module fsm-include="${fsm.include.exampleWebapp}">
+            <id>org.apache.commons:commons-lang3:jar:${commons.lang.version}</id>
+            <!-- This matches the tag in prototype.module.xml -->
+            <dependencyTagValueInXml>example-deps-excluded</dependencyTagValueInXml>
+        </module>
+        <module>
+            <id>org.apache.commons:commons-math3:jar:${commons.math.version}</id>
+            <!-- This matches the tag in prototype.module.xml -->
+            <dependencyTagValueInXml>example-deps</dependencyTagValueInXml>
+        </module>
+    </modules>
+</fsm-maven-plugin>

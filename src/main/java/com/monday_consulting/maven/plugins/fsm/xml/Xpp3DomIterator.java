@@ -88,7 +88,7 @@ public class Xpp3DomIterator implements Iterator<Xpp3Dom>, Iterable<Xpp3Dom> {
                 int pos = -1;
                 Xpp3Dom[] arr = parent.getChildren();
                 for (int i = 0; i < arr.length; i++) {
-                    if (arr[i].getName().equals(current.getName())) {
+                    if (arr[i] == current) {
                         pos = i;
                         break;
                     }

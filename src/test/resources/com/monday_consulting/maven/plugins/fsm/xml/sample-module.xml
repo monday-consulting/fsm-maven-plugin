@@ -1,0 +1,34 @@
+<module>
+    <name>FSM Test Module</name>
+    <version>${project.version}</version>
+    <components>
+        <web-app>
+            <name>FSM Test WebApp 1</name>
+            <version>${project.version}</version>
+            <web-resources>
+                <dependencies>fsm-dependencies-1</dependencies>
+            </web-resources>
+        </web-app>
+        <web-app>
+            <name>FSM Delete Me 2</name>
+            <version>${project.version}</version>
+            <web-resources>
+                <dependencies>fsm-dependencies-2</dependencies>
+            </web-resources>
+        </web-app>
+        <web-app>
+            <name>FSM Test WebApp 3</name>
+            <version>${project.version}</version>
+            <web-resources>
+                <dependencies>fsm-dependencies-3</dependencies>
+            </web-resources>
+        </web-app>
+        <web-app>
+            <name>FSM Delete Me 4</name>
+            <version>${project.version}</version>
+            <web-resources>
+                <dependencies>fsm-dependencies-4</dependencies>
+            </web-resources>
+        </web-app>
+    </components>
+</module>

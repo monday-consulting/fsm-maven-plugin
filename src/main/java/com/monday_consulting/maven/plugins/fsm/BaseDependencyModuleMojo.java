@@ -100,6 +100,12 @@ abstract class BaseDependencyModuleMojo extends BaseFSMMojo {
                         "defined twice\tFix to prevent unpredictable behaviour!\tPlease contact Responsible Developer, XSD has to be fixed!");
             }
 
+            if (!moduleType.isFsmInclude()) {
+                getLog().info("Excluding module " + moduleType.getDependencyTagValueInXml()
+                        + " because fsm-include resolved to false");
+                continue;
+            }
+
             getLog().debug("Resolving module for dependency tag " + moduleType.getDependencyTagValueInXml());
 
             List<MavenCoordinate> artifacts = ModuleIdParser.parseModuleTypeIds(moduleType);

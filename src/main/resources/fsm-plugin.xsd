@@ -40,7 +40,7 @@
 
     <xs:complexType name="moduleType">
         <xs:all>
-            <xs:element type="xs:string" name="id" minOccurs="0"/>
+            <xs:element type="idType" name="id" minOccurs="0"/>
             <xs:element type="idsType" name="ids" minOccurs="0"/>
             <xs:element type="xs:string" name="prefix" minOccurs="0" />
             <xs:element type="resource" name="resource" minOccurs="0"/>
@@ -50,6 +50,7 @@
             <xs:element type="includesType" name="includes" minOccurs="0"/>
             <xs:element type="excludesType" name="excludes" minOccurs="0"/>
         </xs:all>
+        <xs:attribute type="xs:boolean" name="fsm-include" default="true"/>
     </xs:complexType>
 
     <xs:complexType name="resource">
@@ -104,8 +105,16 @@
 
     <xs:complexType name="idsType">
         <xs:sequence maxOccurs="unbounded">
-            <xs:element type="xs:string" name="id"/>
+            <xs:element type="idType" name="id"/>
         </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="idType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="fsm-include" type="xs:boolean" default="true" />
+            </xs:extension>
+        </xs:simpleContent>
     </xs:complexType>
 
 </xs:schema>
