@@ -61,7 +61,9 @@ public class MavenCoordinate {
             sb.append(':').append(classifier);
         }
 
-        sb.append(':').append(version);
+        if (version != null) {
+            sb.append(':').append(version);
+        }
 
         return sb.toString();
     }
