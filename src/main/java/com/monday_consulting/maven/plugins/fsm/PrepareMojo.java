@@ -20,7 +20,10 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 @SuppressWarnings("unused")
 @Mojo(name = "prepare",
@@ -103,8 +106,10 @@ class PrepareMojo extends BaseDependencyModuleMojo {
             ModuleXmlWriter moduleXmlWriter = new ModuleXmlWriter(getLog());
             moduleXmlWriter.writeDomToTarget(fsmRootPath, prototype.getPrototypeDom(), legacyModuleDescriptor);
 
+            final Collection<Module> referencedModules = filterUnreferencedModules(prototype, modules);
+
             getLog().debug("Copying dependencies to " + fsmRootPath);
-            new DependencyAssembler(getLog()).copyDependenciesForModuleAssembly(fsmRootPath, modules.values());
+            new DependencyAssembler(getLog()).copyDependenciesForModuleAssembly(fsmRootPath, referencedModules);
             getLog().debug("Module dependencies were successfully copied.");
 
             if (validate) {
@@ -124,6 +129,33 @@ class PrepareMojo extends BaseDependencyModuleMojo {
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * Filters the resolved modules down to those that are actually referenced by a
+     * {@code <dependencies>} joint in the prototype module descriptor. Modules configured in the
+     * fsm-plugin.xml but not referenced in the prototype are not part of the assembled module, so
+     * copying their dependencies would only bloat the lib directory. Every skipped module is logged
+     * on INFO level.
+     *
+     * @param prototype the parsed prototype module descriptor.
+     * @param modules   all modules resolved from the fsm-plugin.xml, keyed by dependency tag value.
+     * @return the modules that are referenced by the prototype.
+     */
+    private Collection<Module> filterUnreferencedModules(final PrototypeXml prototype, final Map<String, Module> modules) {
+        final Set<String> referencedTagValues = prototype.getReferencedDependencyTagValues();
+        final Collection<Module> referencedModules = new ArrayList<>();
+
+        for (final Map.Entry<String, Module> entry : modules.entrySet()) {
+            if (referencedTagValues.contains(entry.getKey())) {
+                referencedModules.add(entry.getValue());
+            } else {
+                getLog().info("Skipping module '" + entry.getKey() + "' because it is not referenced in the" +
+                        " prototype module descriptor. Its dependencies will not be copied to the lib directory.");
+            }
+        }
+
+        return referencedModules;
     }
 
 }

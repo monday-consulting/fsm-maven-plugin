@@ -140,6 +140,23 @@ instead to refer to entries from the `configXml`.
     </module>
 ```
 
+## Conditional inclusion
+
+The `fsm-include` attribute (default `true`, ideally driven by a Maven property) lets one prototype and config produce
+different FSMs by toggling parts on and off:
+- In the **prototype module descriptor**, on any element: `false` removes the element and its subtree from the generated
+  `module.xml`. It must resolve to a boolean literal — an unresolved property like `${fsm.include.foo}` fails the build.
+- In the **config-xml**, on a `<module>` or `<id>`: `false` skips resolving those dependencies into the `lib` directory.
+
+```xml
+    <web-app fsm-include="${fsm.include.foo}">    <!-- prototype descriptor -->
+    <module fsm-include="${fsm.include.foo}">     <!-- config-xml -->
+```
+
+The prototype decides what ends up in the FSM; a config-xml module it no longer references simply becomes unused and is
+ignored, so disabling it there too is optional. Driving both from the same property is the safest pattern. See the
+integration test [d2xml-fsm-include-example](./src/it/d2xml-fsm-include-example) for a runnable setup.
+
 ## Plugin output
 
 The plugin prepares the folder structure of a FirstSpirit module, which already contains the `module.xml` as well as

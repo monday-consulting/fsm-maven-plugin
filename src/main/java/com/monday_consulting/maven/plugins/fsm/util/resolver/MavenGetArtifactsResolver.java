@@ -23,6 +23,8 @@ import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.*;
 import org.eclipse.aether.RepositorySystem;
@@ -32,6 +34,7 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -147,6 +150,22 @@ public class MavenGetArtifactsResolver implements IResolver {
         return new DefaultProjectBuildingRequest(session.getProjectBuildingRequest()).setResolveDependencies(true);
     }
 
+    private String getManagedVersion(final MavenCoordinate artifact) {
+        final DependencyManagement dependencyManagement = parentMavenProject.getDependencyManagement();
+        if (dependencyManagement == null) {
+            return null;
+        }
+        for (final Dependency dependency : dependencyManagement.getDependencies()) {
+            if (dependency.getGroupId().equals(artifact.getGroupId())
+                    && dependency.getArtifactId().equals(artifact.getArtifactId())
+                    && dependency.getType().equals(artifact.getExtension())
+                    && Objects.equals(dependency.getClassifier(), artifact.getClassifier())) {
+                return dependency.getVersion();
+            }
+        }
+        return null;
+    }
+
     private Artifact coordinateToArtifact(MavenCoordinate artifactCoordinate) {
         return coordinateToArtifact(artifactCoordinate, artifactCoordinate.getExtension());
     }
@@ -167,11 +186,22 @@ public class MavenGetArtifactsResolver implements IResolver {
             final ArtifactRepository localRepository = session.getLocalRepository();
             final File repoBasedir = new File(localRepository.getBasedir());
 
-            if ((artifact.getVersion() == null || artifact.getVersion().isEmpty())
-                    && parentMavenProject.getGroupId().equals(artifact.getGroupId())) {
-                log.info("Assuming project version " + parentMavenProject.getVersion()
-                        + " for artifact " + artifact);
-                artifact.setVersion(parentMavenProject.getVersion());
+            if (artifact.getVersion() == null || artifact.getVersion().isEmpty()) {
+                final String managedVersion = getManagedVersion(artifact);
+                if (managedVersion != null && !managedVersion.isEmpty()) {
+                    log.debug("Using version " + managedVersion
+                            + " from dependencyManagement for artifact " + artifact);
+                    artifact.setVersion(managedVersion);
+                } else if (parentMavenProject.getGroupId().equals(artifact.getGroupId())) {
+                    log.debug("Assuming project version " + parentMavenProject.getVersion()
+                            + " for artifact " + artifact);
+                    artifact.setVersion(parentMavenProject.getVersion());
+                } else {
+                    throw new RuntimeException("No version specified for module id "
+                            + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getExtension()
+                            + " and none could be resolved from the reactor or the project's dependencyManagement."
+                            + " Please add the artifact to <dependencyManagement> or specify the version in the id.");
+                }
             }
 
             final String pathForLocalArtifact = localRepository.pathOf(coordinateToArtifact(artifact));

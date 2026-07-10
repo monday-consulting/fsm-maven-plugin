@@ -1,0 +1,29 @@
+<module>
+
+    <name>Monday FSM-Include Example</name>
+    <version>${project.version}</version>
+
+    <components>
+        <web-app>
+            <name>My Example WebApp</name>
+            <version>${project.version}</version>
+            <web-resources>
+                <!-- Tag from plugin.xml -->
+                <dependencies>example-deps</dependencies>
+            </web-resources>
+        </web-app>
+        <web-app fsm-include="${fsm.include.exampleWebapp}">
+            <name>Excluded Example WebApp</name>
+            <version>${project.version}</version>
+            <web-resources>
+                <!-- Tag from plugin.xml -->
+                <dependencies>example-deps-excluded</dependencies>
+            </web-resources>
+        </web-app>
+
+        <public fsm-include="${fsm.include.exampleWebapp}">
+            <name>TestExecutable</name>
+            <class>com.monday-consulting.maven.plugins.TestWebAppExecutable</class>
+        </public>
+    </components>
+</module>

@@ -1,5 +1,6 @@
 package com.monday_consulting.maven.plugins.fsm.util;
 
+import com.monday_consulting.maven.plugins.fsm.jaxb.IdType;
 import com.monday_consulting.maven.plugins.fsm.jaxb.ModuleType;
 import com.monday_consulting.maven.plugins.fsm.maven.MavenCoordinate;
 
@@ -16,13 +17,15 @@ public class ModuleIdParser {
             throw new RuntimeException("ModuleType parsing failed: Missing module property '<id>' or '<ids>'.");
         }
 
-        if (moduleType.getId() != null) {
-            artifacts.add(parseID(moduleType.getId()));
+        if (moduleType.getId() != null && moduleType.getId().isFsmInclude()) {
+            artifacts.add(parseID(moduleType.getId().getValue()));
         }
 
         if (moduleType.getIds() != null) {
-            for (String id : moduleType.getIds().getId()) {
-                artifacts.add(parseID(id));
+            for (IdType idType : moduleType.getIds().getId()) {
+                if (idType.isFsmInclude()) {
+                    artifacts.add(parseID(idType.getValue()));
+                }
             }
         }
 
